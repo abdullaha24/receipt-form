@@ -26,6 +26,8 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [submittedProducts, setSubmittedProducts] = useState<ProductData[]>([]);
 
   const fetchProducts = async () => {
     setIsLoadingProducts(true);
@@ -143,7 +145,10 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
 
         // Success
         await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UX
-        alert("Form submitted successfully!");
+        
+        setSubmittedProducts(products);
+        setShowSuccessModal(true);
+
         
         // Reset Form
         setSelectedUser("");
@@ -238,6 +243,54 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
         onClose={() => setIsSettingsOpen(false)} 
         onUpdateSuccess={fetchProducts}
       />
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-6 bg-green-50 border-b border-green-100 flex items-center gap-4">
+                <div className="bg-green-100 p-2 rounded-full text-green-600">
+                    <Check size={28} strokeWidth={3} />
+                </div>
+                <div>
+                   <h3 className="text-xl font-bold text-gray-900">Submission Successful</h3>
+                   <p className="text-green-700">The following items have been recorded.</p>
+                </div>
+            </div>
+            
+            <div className="p-0 max-h-[60vh] overflow-y-auto">
+                <table className="w-full text-left border-collapse">
+                    <thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
+                        <tr>
+                            <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Product Name</th>
+                            <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Quantity</th>
+                            <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                        {submittedProducts.map((p, i) => (
+                            <tr key={i} className="hover:bg-gray-50 transition-colors">
+                                <td className="py-3 px-4 text-sm font-medium text-gray-900">{p.productName}</td>
+                                <td className="py-3 px-4 text-sm text-gray-600">{p.quantity}</td>
+                                <td className="py-3 px-4 text-sm text-gray-500 italic">{p.notes || "-"}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end">
+                <button
+                    onClick={() => setShowSuccessModal(false)}
+                    className="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-lg transition-colors shadow-sm active:scale-95 flex items-center gap-2"
+                >
+                    <span>OK, Close</span>
+                    <Check size={16} />
+                </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
