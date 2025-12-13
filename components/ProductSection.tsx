@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { PRODUCTS } from '../utils/constants';
 import { Search, ChevronDown, Trash2 } from 'lucide-react';
 
 interface ProductData {
@@ -14,9 +13,10 @@ interface ProductSectionProps {
   updateData: (index: number, field: keyof ProductData, value: string) => void;
   removeSection: (index: number) => void;
   isOnlySection: boolean;
+  availableProducts: string[]; // [NEW] Accept dynamic list
 }
 
-const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData, removeSection, isOnlySection }) => {
+const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData, removeSection, isOnlySection, availableProducts }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showWarning, setShowWarning] = useState(false);
@@ -35,7 +35,8 @@ const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData
     };
   }, [wrapperRef]);
 
-  const filteredProducts = PRODUCTS.filter(product =>
+  // [MODIFIED] Use the prop instead of constant
+  const filteredProducts = availableProducts.filter(product =>
     product.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -47,7 +48,6 @@ const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData
 
   const handleQuantityChange = (value: string) => {
     // Regex allows empty string, or positive/negative integers/decimals
-    // If you only want positive numbers, use /^\d*\.?\d*$/
     const isNumeric = /^-?\d*\.?\d*$/.test(value);
     
     if (isNumeric) {
@@ -55,12 +55,6 @@ const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData
       updateData(index, 'quantity', value);
     } else {
       setShowWarning(true);
-      // Still update the field so they can see what they typed (standard input behavior), 
-      // OR we can block the update?
-      // User request: "allowed floating points and ints... if user enters non-numeric... tell the user in a tooltip"
-      // Blocking input is often safer for data integrity, but if we want to show a tooltip WARNING, we usually let them type it.
-      // However, typical "number only" fields often block invalid chars.
-      // Interpreting "if user enters... tell user" as "let them type, but warn".
       updateData(index, 'quantity', value);
     }
   };
@@ -113,11 +107,15 @@ const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData
                     />
                   </div>
                 </div>
-                {filteredProducts.length > 0 ? (
+                {availableProducts.length === 0 ? (
+                     <div className="px-4 py-3 text-sm text-amber-600 bg-amber-50 text-center">
+                        List is empty. Upload products in Settings.
+                     </div>
+                ) : filteredProducts.length > 0 ? (
                   <ul>
-                    {filteredProducts.map((product) => (
+                    {filteredProducts.map((product, idx) => (
                       <li
-                        key={product}
+                        key={`${product}-${idx}`}
                         className={`px-4 py-2 text-sm cursor-pointer hover:bg-blue-50 flex items-center justify-between ${data.productName === product ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'}`}
                         onClick={() => handleSelectProduct(product)}
                       >

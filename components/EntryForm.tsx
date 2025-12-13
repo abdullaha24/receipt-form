@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import ProductSection from './ProductSection';
-import { Plus, Check, Loader2 } from 'lucide-react';
+import SettingsModal from './SettingsModal';
+import { Plus, Check, Loader2, Settings } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface EntryFormProps {
@@ -21,7 +22,29 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
   const [products, setProducts] = useState<ProductData[]>([
     { productName: "", quantity: "", notes: "" }
   ]);
+  const [availableProducts, setAvailableProducts] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+
+  const fetchProducts = async () => {
+    setIsLoadingProducts(true);
+    try {
+        const res = await fetch(`/api/products?type=${type}`);
+        if(res.ok) {
+            const data = await res.json();
+            setAvailableProducts(data || []);
+        }
+    } catch (error) {
+        console.error("Failed to fetch products", error);
+    } finally {
+        setIsLoadingProducts(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [type]);
 
   const updateProductData = (index: number, field: keyof ProductData, value: string) => {
     const newProducts = [...products];
@@ -95,9 +118,18 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
-        <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{title}</h1>
-            <p className="mt-2 text-gray-600">Please fill in the details below to record a new {type}.</p>
+        <div className="mb-8 flex justify-between items-start">
+            <div>
+                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{title}</h1>
+                <p className="mt-2 text-gray-600">Please fill in the details below to record a new {type}.</p>
+            </div>
+            <button 
+                onClick={() => setIsSettingsOpen(true)}
+                className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all"
+                title="Open Settings"
+            >
+                <Settings size={22} />
+            </button>
         </div>
 
         <Header
@@ -108,7 +140,10 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
         />
 
         <div className="space-y-4 mb-8">
-            <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Item Details</h2>
+            <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex justify-between">
+                <span>Item Details</span>
+                {isLoadingProducts && <span className="text-xs normal-case text-gray-500 flex items-center gap-1"><Loader2 size={12} className="animate-spin" /> Loading products...</span>}
+            </h2>
             {products.map((product, index) => (
             <ProductSection
                 key={index}
@@ -117,6 +152,7 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
                 updateData={updateProductData}
                 removeSection={removeProductSection}
                 isOnlySection={products.length === 1}
+                availableProducts={availableProducts}
             />
             ))}
         </div>
@@ -153,6 +189,12 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
         {/* Spacer for fixed bottom button on mobile */}
         <div className="h-24 sm:h-0"></div>
       </div>
+      
+      <SettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+        onUpdateSuccess={fetchProducts}
+      />
     </div>
   );
 };
