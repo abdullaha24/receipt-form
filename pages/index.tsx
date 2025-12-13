@@ -33,14 +33,14 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <Head>
-        <title>Factory Entry System</title>
+        <title>Data Entry System</title>
         <meta name="description" content="Central hub for factory tracking" />
       </Head>
 
       <div className="max-w-4xl w-full">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl mb-4">
-            Factory Entry System
+            Rawat Factory Data Entry System
           </h1>
           <p className="text-xl text-gray-500">
             Select an action below to get started.
@@ -66,7 +66,7 @@ export default function Home() {
         </div>
         
         <div className="mt-12 text-center text-gray-400 text-sm">
-            &copy; {new Date().getFullYear()} Factory Management Systems
+            &copy; {new Date().getFullYear()} Mitchell Construction Chemicals
         </div>
       </div>
     </div>
