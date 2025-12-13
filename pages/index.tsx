@@ -1,8 +1,11 @@
 import Head from "next/head";
 import Link from "next/link";
-import { ArrowRight, Inbox, Send, Factory } from 'lucide-react';
+import { ArrowRight, Inbox, Send, Factory, Settings } from 'lucide-react';
+import { useState } from 'react';
+import ApiSettingsModal from '../components/ApiSettingsModal';
 
 export default function Home() {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const cards = [
     {
       title: "Material Receipt",
@@ -45,6 +48,15 @@ export default function Home() {
           <p className="text-xl text-gray-500">
             Select an action below to get started.
           </p>
+          <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
+            <button 
+                onClick={() => setIsSettingsOpen(true)}
+                className="p-3 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-full transition-all"
+                title="API Settings"
+            >
+                <Settings size={28} />
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -69,6 +81,10 @@ export default function Home() {
             &copy; {new Date().getFullYear()} Mitchell Construction Chemicals
         </div>
       </div>
+      <ApiSettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+      />
     </div>
   );
 }

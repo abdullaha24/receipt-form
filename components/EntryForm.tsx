@@ -96,23 +96,66 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    console.log("Submitting Form...", {
-        type,
-        user: selectedUser,
-        date: format(selectedDate, 'dd-MM-yyyy'),
-        items: products
-    });
+    // Construct Payload
+    const payload = {
+        header: {
+            formType: type,
+            user: selectedUser,
+            date: format(selectedDate, 'dd-MM-yyyy'),
+            submissionTimestamp: new Date().toISOString()
+        },
+        body: {
+            products: products
+        }
+    };
 
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    alert("Form submitted successfully! (Check console for data)");
-    
-    // Reset Form
-    setSelectedUser("");
-    setSelectedDate(new Date());
-    setProducts([{ productName: "", quantity: "", notes: "" }]);
-    setIsSubmitting(false);
+    console.log("Form Submission Payload:", JSON.stringify(payload, null, 2));
+
+    try {
+        // 1. Get the configured endpoint
+        const settingsRes = await fetch('/api/settings');
+        if (!settingsRes.ok) {
+            throw new Error("Failed to retrieve API configuration");
+        }
+        const settings = await settingsRes.json();
+        
+        if (!settings.endpoint) {
+            // Warn user if no endpoint is configured, but strictly speaking we might just log it 
+            // or we could treat it as a success for the UI but warn about no upload.
+            // For now, let's alert and stop to ensure they know it didn't go anywhere external.
+            alert("No API endpoint configured! Please set one in the Home screen settings.");
+            setIsSubmitting(false);
+            return;
+        }
+
+        // 2. Send data to the endpoint
+        const uploadRes = await fetch(settings.endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!uploadRes.ok) {
+             throw new Error(`External API Error: ${uploadRes.status} ${uploadRes.statusText}`);
+        }
+
+        // Success
+        await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UX
+        alert("Form submitted successfully!");
+        
+        // Reset Form
+        setSelectedUser("");
+        setSelectedDate(new Date());
+        setProducts([{ productName: "", quantity: "", notes: "" }]);
+
+    } catch (error: any) {
+        console.error("Submission Error:", error);
+        alert(`Submission Failed: ${error.message}`);
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (
