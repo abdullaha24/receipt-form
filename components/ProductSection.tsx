@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { PRODUCTS } from '../utils/constants';
 import { Search, ChevronDown, Trash2 } from 'lucide-react';
 
 interface ProductData {
@@ -14,11 +13,13 @@ interface ProductSectionProps {
   updateData: (index: number, field: keyof ProductData, value: string) => void;
   removeSection: (index: number) => void;
   isOnlySection: boolean;
+  availableProducts: string[]; // [NEW] Accept dynamic list
 }
 
-const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData, removeSection, isOnlySection }) => {
+const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData, removeSection, isOnlySection, availableProducts }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showWarning, setShowWarning] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -34,7 +35,8 @@ const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData
     };
   }, [wrapperRef]);
 
-  const filteredProducts = PRODUCTS.filter(product =>
+  // [MODIFIED] Use the prop instead of constant
+  const filteredProducts = availableProducts.filter(product =>
     product.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -42,6 +44,19 @@ const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData
     updateData(index, 'productName', product);
     setSearchTerm("");
     setIsOpen(false);
+  };
+
+  const handleQuantityChange = (value: string) => {
+    // Regex allows empty string, or positive/negative integers/decimals
+    const isNumeric = /^-?\d*\.?\d*$/.test(value);
+    
+    if (isNumeric) {
+      setShowWarning(false);
+      updateData(index, 'quantity', value);
+    } else {
+      setShowWarning(true);
+      updateData(index, 'quantity', value);
+    }
   };
 
   return (
@@ -92,11 +107,15 @@ const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData
                     />
                   </div>
                 </div>
-                {filteredProducts.length > 0 ? (
+                {availableProducts.length === 0 ? (
+                     <div className="px-4 py-3 text-sm text-amber-600 bg-amber-50 text-center">
+                        List is empty. Upload products in Settings.
+                     </div>
+                ) : filteredProducts.length > 0 ? (
                   <ul>
-                    {filteredProducts.map((product) => (
+                    {filteredProducts.map((product, idx) => (
                       <li
-                        key={product}
+                        key={`${product}-${idx}`}
                         className={`px-4 py-2 text-sm cursor-pointer hover:bg-blue-50 flex items-center justify-between ${data.productName === product ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'}`}
                         onClick={() => handleSelectProduct(product)}
                       >
@@ -113,17 +132,22 @@ const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData
         </div>
 
         {/* Quantity */}
-        <div className="space-y-2">
+        <div className="space-y-2 relative">
           <label className="block text-sm font-medium text-gray-700">
             Quantity <span className="text-red-500">*</span>
           </label>
           <input
-            type="number"
+            type="text"
             value={data.quantity}
-            onChange={(e) => updateData(index, 'quantity', e.target.value)}
+            onChange={(e) => handleQuantityChange(e.target.value)}
             placeholder="Enter quantity"
-            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+            className={`w-full p-3 bg-gray-50 border rounded-lg transition-all outline-none ${showWarning ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'}`}
           />
+          {showWarning && (
+            <div className="absolute z-10 left-0 -bottom-10 bg-red-600 text-white text-xs px-3 py-2 rounded shadow-lg after:content-[''] after:absolute after:left-4 after:-top-1 after:w-2 after:h-2 after:bg-red-600 after:rotate-45">
+               Only numbers allowed. Please enter a number.
+            </div>
+          )}
         </div>
 
         {/* Notes (Optional) */}

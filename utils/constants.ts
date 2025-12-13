@@ -1,9 +1,8 @@
 export const USERS = [
-  "Alice Smith",
-  "Bob Jones",
-  "Charlie Brown",
-  "David Wilson",
-  "Eva Green",
+  "Bashir Ahmad",
+  "Jawad Ahmad",
+  "Abdullah Asif",
+  "Admin",
 ];
 
 export const PRODUCTS = [

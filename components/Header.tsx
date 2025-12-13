@@ -50,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ selectedUser, setSelectedUser, selected
               selected={selectedDate}
               onChange={(date) => setSelectedDate(date)}
               dateFormat="dd-MM-yyyy"
-              className="w-full p-3 pl-10 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+              className="w-full p-3 !pl-12 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
               placeholderText="dd-mm-yyyy"
             />
             <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />

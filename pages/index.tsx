@@ -1,8 +1,11 @@
 import Head from "next/head";
 import Link from "next/link";
-import { ArrowRight, Inbox, Send, Factory } from 'lucide-react';
+import { ArrowRight, Inbox, Send, Factory, Settings } from 'lucide-react';
+import { useState } from 'react';
+import ApiSettingsModal from '../components/ApiSettingsModal';
 
 export default function Home() {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const cards = [
     {
       title: "Material Receipt",
@@ -33,18 +36,27 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <Head>
-        <title>Factory Entry System</title>
+        <title>Data Entry System</title>
         <meta name="description" content="Central hub for factory tracking" />
       </Head>
 
       <div className="max-w-4xl w-full">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl mb-4">
-            Factory Entry System
+            Rawat Factory Data Entry System
           </h1>
           <p className="text-xl text-gray-500">
             Select an action below to get started.
           </p>
+          <div className="absolute top-4 right-4 sm:top-8 sm:right-8">
+            <button 
+                onClick={() => setIsSettingsOpen(true)}
+                className="p-3 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-full transition-all"
+                title="API Settings"
+            >
+                <Settings size={28} />
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -66,9 +78,13 @@ export default function Home() {
         </div>
         
         <div className="mt-12 text-center text-gray-400 text-sm">
-            &copy; {new Date().getFullYear()} Factory Management Systems
+            &copy; {new Date().getFullYear()} Mitchell Construction Chemicals
         </div>
       </div>
+      <ApiSettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+      />
     </div>
   );
 }
