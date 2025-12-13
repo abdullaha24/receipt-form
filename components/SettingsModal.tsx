@@ -70,62 +70,64 @@ export default function SettingsModal({ isOpen, onClose, onUpdateSuccess }: Sett
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
         
         {/* Header */}
-        <div className="flex justify-between items-center p-5 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <FileSpreadsheet className="text-blue-600" size={24} />
+        <div className="flex justify-between items-center p-6 border-b border-gray-100/50">
+          <h2 className="text-xl font-semibold text-[#1d1d1f] flex items-center gap-2 tracking-tight">
+            <FileSpreadsheet className="text-[#0071e3]" size={22} />
             Manage Products
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition-colors">
-            <X size={20} />
+          <button onClick={onClose} className="text-[#86868b] hover:text-[#1d1d1f] bg-gray-50 hover:bg-gray-100 p-2 rounded-full transition-colors">
+            <X size={18} />
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b border-gray-100">
-          <button
-            onClick={() => { setActiveTab('receipt'); setStatus({ type: null, message: '' }); }}
-            className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'receipt' ? 'text-blue-600 border-blue-600 bg-blue-50/50' : 'text-gray-500 border-transparent hover:text-gray-700'}`}
-          >
-            Receipt & Issuance
-          </button>
-          <button
-            onClick={() => { setActiveTab('production'); setStatus({ type: null, message: '' }); }}
-            className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'production' ? 'text-blue-600 border-blue-600 bg-blue-50/50' : 'text-gray-500 border-transparent hover:text-gray-700'}`}
-          >
-            Production
-          </button>
+        {/* Apple Style Segmented Control */}
+        <div className="px-6 pt-6">
+            <div className="flex bg-[#f5f5f7] p-1 rounded-xl">
+            <button
+                onClick={() => { setActiveTab('receipt'); setStatus({ type: null, message: '' }); }}
+                className={`flex-1 py-1.5 text-[13px] font-medium rounded-lg transition-all shadow-sm ${activeTab === 'receipt' ? 'bg-white text-[#1d1d1f] shadow' : 'bg-transparent text-[#86868b] shadow-none hover:text-[#1d1d1f]'}`}
+            >
+                Receipt & Issuance
+            </button>
+            <button
+                onClick={() => { setActiveTab('production'); setStatus({ type: null, message: '' }); }}
+                className={`flex-1 py-1.5 text-[13px] font-medium rounded-lg transition-all shadow-sm ${activeTab === 'production' ? 'bg-white text-[#1d1d1f] shadow' : 'bg-transparent text-[#86868b] shadow-none hover:text-[#1d1d1f]'}`}
+            >
+                Production
+            </button>
+            </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
             
-          <div className="space-y-4">
+          <div className="space-y-5">
              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-500 uppercase">Sheet Name</label>
+                <div className="space-y-2">
+                    <label className="text-[13px] font-medium text-[#1d1d1f]">Sheet Name</label>
                     <input 
                         type="text" 
                         value={sheetName} 
                         onChange={(e) => setSheetName(e.target.value)}
                         placeholder="e.g. Sheet1"
-                        className="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="w-full p-3 bg-[#f5f5f7] border-none rounded-xl text-sm text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3]/20 focus:bg-white transition-all outline-none placeholder-gray-400"
                     />
                 </div>
-                <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-500 uppercase">Column (Letter)</label>
+                <div className="space-y-2">
+                    <label className="text-[13px] font-medium text-[#1d1d1f]">Column (Letter)</label>
                     <input 
                         type="text" 
                         value={columnRef} 
                         onChange={(e) => setColumnRef(e.target.value.toUpperCase())}
                         placeholder="e.g. A"
-                        className="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="w-full p-3 bg-[#f5f5f7] border-none rounded-xl text-sm text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3]/20 focus:bg-white transition-all outline-none placeholder-gray-400"
                     />
                 </div>
              </div>
 
-             <div className="space-y-1">
-                <label className="text-xs font-medium text-gray-500 uppercase">Excel File</label>
-                <div className="relative border-2 border-dashed border-gray-200 rounded-xl p-4 hover:bg-gray-50 hover:border-blue-300 transition-colors text-center cursor-pointer group">
+             <div className="space-y-2">
+                <label className="text-[13px] font-medium text-[#1d1d1f]">Excel File</label>
+                <div className="relative border border-dashed border-[#d2d2d7] rounded-2xl p-6 hover:bg-[#f5f5f7] hover:border-[#0071e3]/50 transition-all text-center cursor-pointer group">
                     <input 
                         type="file" 
                         accept=".xlsx, .xls"
@@ -135,14 +137,18 @@ export default function SettingsModal({ isOpen, onClose, onUpdateSuccess }: Sett
                     <div className="flex flex-col items-center gap-2">
                         {file ? (
                              <>
-                                <FileSpreadsheet className="text-green-500" size={24} />
-                                <span className="text-sm font-medium text-gray-700 truncate max-w-[200px]">{file.name}</span>
-                                <span className="text-xs text-blue-500 group-hover:underline">Click to change</span>
+                                <div className="bg-[#34c759]/10 p-3 rounded-full text-[#34c759]">
+                                    <FileSpreadsheet size={24} />
+                                </div>
+                                <span className="text-sm font-medium text-[#1d1d1f] truncate max-w-[200px]">{file.name}</span>
+                                <span className="text-xs text-[#0071e3] font-medium group-hover:underline">Click to replace</span>
                              </>
                         ) : (
                             <>
-                                <Upload className="text-gray-400 group-hover:text-blue-500 transition-colors" size={24} />
-                                <span className="text-sm text-gray-500">Click to upload Excel file</span>
+                                <div className="bg-[#f5f5f7] p-3 rounded-full text-[#86868b] group-hover:bg-white group-hover:shadow-sm group-hover:text-[#0071e3] transition-all">
+                                    <Upload size={24} />
+                                </div>
+                                <span className="text-sm text-[#86868b] font-medium">Click to upload Excel file</span>
                             </>
                         )}
                     </div>
@@ -152,9 +158,9 @@ export default function SettingsModal({ isOpen, onClose, onUpdateSuccess }: Sett
 
           {/* Status Message */}
           {status.message && (
-            <div className={`p-3 rounded-lg text-sm flex items-start gap-2 ${status.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+            <div className={`p-3 rounded-xl text-sm flex items-start gap-2 animate-in fade-in slide-in-from-top-1 ${status.type === 'success' ? 'bg-[#34c759]/10 text-[#34c759]' : 'bg-[#ff3b30]/10 text-[#ff3b30]'}`}>
                 {status.type === 'success' ? <Check size={16} className="mt-0.5" /> : <AlertCircle size={16} className="mt-0.5" />}
-                {status.message}
+                <span className="font-medium">{status.message}</span>
             </div>
           )}
 
@@ -162,7 +168,7 @@ export default function SettingsModal({ isOpen, onClose, onUpdateSuccess }: Sett
             <button
                 type="submit"
                 disabled={isUploading}
-                className="w-full py-2.5 px-4 bg-gray-900 hover:bg-black text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-3.5 px-4 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full font-semibold text-[15px] shadow-sm hover:shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
                 {isUploading ? (
                     <>
@@ -177,8 +183,8 @@ export default function SettingsModal({ isOpen, onClose, onUpdateSuccess }: Sett
             </button>
           </div>
           
-           <p className="text-xs text-gray-400 text-center">
-              Target: {activeTab === 'receipt' ? 'receipt/issuance' : 'production'} forms
+           <p className="text-[11px] text-[#86868b] text-center">
+              Updates the dropdown list for {activeTab === 'receipt' ? 'Receipt & Issuance' : 'Production Entry'} forms.
            </p>
 
         </form>

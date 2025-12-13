@@ -60,46 +60,49 @@ const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-4 relative transition-all hover:shadow-md">
-       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Item {index + 1}</h3>
+    <div className="bg-[#f5f5f7] p-6 rounded-2xl mb-6 relative transition-all group border border-transparent hover:border-[#d2d2d7]/50">
+       <div className="flex justify-between items-center mb-5">
+        <h3 className="text-sm font-bold text-[#86868b] uppercase tracking-wider flex items-center gap-2">
+            <span className="bg-[#e5e5ea] w-6 h-6 rounded-full flex items-center justify-center text-xs text-[#1d1d1f]">{index + 1}</span>
+            <span>Product Details</span>
+        </h3>
         {!isOnlySection && (
             <button 
                 onClick={() => removeSection(index)}
-                className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50"
+                className="text-[#ff3b30] bg-white hover:bg-[#fff0f0] transition-colors p-2 rounded-full shadow-sm"
                 title="Remove item"
             >
-                <Trash2 size={18} />
+                <Trash2 size={16} />
             </button>
         )}
       </div>
 
       <div className="space-y-6">
         {/* Product Name (Searchable Dropdown) */}
-        <div className="space-y-2" ref={wrapperRef}>
-          <label className="block text-sm font-medium text-gray-700">
-            Product Name <span className="text-red-500">*</span>
+        <div className="space-y-3" ref={wrapperRef}>
+          <label className="block text-[15px] font-medium text-[#1d1d1f]">
+            Product Name <span className="text-[#ff3b30]">*</span>
           </label>
           <div className="relative">
             <div
-              className={`w-full p-3 bg-gray-50 border border-gray-200 rounded-lg flex justify-between items-center cursor-pointer hover:border-blue-400 transition-colors ${isOpen ? 'ring-2 ring-blue-500 border-blue-500' : ''}`}
+              className={`w-full p-4 bg-white border-2 border-transparent rounded-xl flex justify-between items-center cursor-pointer shadow-sm hover:shadow transition-all ${isOpen ? 'ring-2 ring-[#0071e3]/20 !border-[#0071e3]' : ''}`}
               onClick={() => setIsOpen(!isOpen)}
             >
-              <span className={data.productName ? 'text-gray-900' : 'text-gray-400'}>
+              <span className={data.productName ? 'text-[#1d1d1f] font-medium' : 'text-gray-400'}>
                 {data.productName || "Select Product"}
               </span>
-              <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'transform rotate-180' : ''}`} />
+              <ChevronDown className={`w-4 h-4 text-[#86868b] transition-transform ${isOpen ? 'transform rotate-180' : ''}`} />
             </div>
 
             {isOpen && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
-                <div className="p-2 sticky top-0 bg-white border-b border-gray-100">
+              <div className="absolute z-20 w-full mt-2 bg-white/90 backdrop-blur-xl border border-[#d2d2d7] rounded-xl shadow-xl max-h-60 overflow-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200">
+                <div className="p-3 sticky top-0 bg-white/50 backdrop-blur border-b border-gray-100">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#86868b] w-4 h-4" />
                     <input
                       type="text"
-                      className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      placeholder="Search products..."
+                      className="w-full pl-10 pr-4 py-2 text-sm bg-[#f5f5f7] border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f]"
+                      placeholder="Search..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       autoFocus
@@ -108,15 +111,15 @@ const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData
                   </div>
                 </div>
                 {availableProducts.length === 0 ? (
-                     <div className="px-4 py-3 text-sm text-amber-600 bg-amber-50 text-center">
-                        List is empty. Upload products in Settings.
+                     <div className="px-4 py-3 text-sm text-[#ff9f0a] bg-amber-50/50 text-center">
+                        List is empty. Use settings to update.
                      </div>
                 ) : filteredProducts.length > 0 ? (
-                  <ul>
+                  <ul className="py-2">
                     {filteredProducts.map((product, idx) => (
                       <li
                         key={`${product}-${idx}`}
-                        className={`px-4 py-2 text-sm cursor-pointer hover:bg-blue-50 flex items-center justify-between ${data.productName === product ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'}`}
+                        className={`px-4 py-2.5 text-sm cursor-pointer hover:bg-[#0071e3] hover:text-white transition-colors flex items-center justify-between mx-2 rounded-lg ${data.productName === product ? 'bg-[#0071e3]/10 text-[#0071e3] font-bold' : 'text-[#1d1d1f]'}`}
                         onClick={() => handleSelectProduct(product)}
                       >
                         {product}
@@ -124,7 +127,7 @@ const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData
                     ))}
                   </ul>
                 ) : (
-                    <div className="px-4 py-3 text-sm text-gray-500 text-center">No products found</div>
+                    <div className="px-4 py-3 text-sm text-[#86868b] text-center">No products found</div>
                 )}
               </div>
             )}
@@ -132,35 +135,35 @@ const ProductSection: React.FC<ProductSectionProps> = ({ index, data, updateData
         </div>
 
         {/* Quantity */}
-        <div className="space-y-2 relative">
-          <label className="block text-sm font-medium text-gray-700">
-            Quantity <span className="text-red-500">*</span>
+        <div className="space-y-3 relative">
+          <label className="block text-[15px] font-medium text-[#1d1d1f]">
+            Quantity <span className="text-[#ff3b30]">*</span>
           </label>
           <input
             type="text"
             value={data.quantity}
             onChange={(e) => handleQuantityChange(e.target.value)}
-            placeholder="Enter quantity"
-            className={`w-full p-3 bg-gray-50 border rounded-lg transition-all outline-none ${showWarning ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'}`}
+            placeholder="0"
+            className={`w-full p-4 bg-white border-2 border-transparent rounded-xl shadow-sm transition-all outline-none font-medium placeholder-gray-300 ${showWarning ? '!border-[#ff3b30] focus:ring-4 focus:ring-[#ff3b30]/20' : 'focus:border-[#0071e3] focus:ring-4 focus:ring-[#0071e3]/10'}`}
           />
           {showWarning && (
-            <div className="absolute z-10 left-0 -bottom-10 bg-red-600 text-white text-xs px-3 py-2 rounded shadow-lg after:content-[''] after:absolute after:left-4 after:-top-1 after:w-2 after:h-2 after:bg-red-600 after:rotate-45">
-               Only numbers allowed. Please enter a number.
+            <div className="absolute z-10 left-0 -bottom-12 bg-[#ff3b30] text-white text-xs px-3 py-2 rounded-lg shadow-lg font-medium animate-in slide-in-from-top-2">
+               Only numbers allowed.
             </div>
           )}
         </div>
 
         {/* Notes (Optional) */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Notes <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+        <div className="space-y-3">
+          <label className="block text-[15px] font-medium text-[#1d1d1f]">
+            Notes <span className="text-[#86868b] text-xs font-normal ml-1">(Optional)</span>
           </label>
           <textarea
             value={data.notes}
             onChange={(e) => updateData(index, 'notes', e.target.value)}
-            placeholder="Add any additional details..."
-            rows={3}
-            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none resize-none"
+            placeholder="Add any additional details about this item..."
+            rows={2}
+            className="w-full p-4 bg-white border-2 border-transparent rounded-xl shadow-sm focus:border-[#0071e3] focus:ring-4 focus:ring-[#0071e3]/10 transition-all outline-none resize-none font-sans"
           />
         </div>
       </div>

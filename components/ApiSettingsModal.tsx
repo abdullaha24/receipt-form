@@ -77,17 +77,17 @@ export default function ApiSettingsModal({ isOpen, onClose }: ApiSettingsModalPr
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-md transition-all">
+      <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 border border-white/20">
         
         {/* Header */}
-        <div className="flex justify-between items-center p-5 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <Server className="text-purple-600" size={24} />
+        <div className="flex justify-between items-center p-6 border-b border-gray-100/50">
+          <h2 className="text-xl font-semibold text-[#1d1d1f] flex items-center gap-2 tracking-tight">
+            <Server className="text-[#0071e3]" size={22} />
             API Configuration
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition-colors">
-            <X size={20} />
+          <button onClick={onClose} className="text-[#86868b] hover:text-[#1d1d1f] bg-gray-50 hover:bg-gray-100 p-2 rounded-full transition-colors">
+            <X size={18} />
           </button>
         </div>
 
@@ -95,7 +95,7 @@ export default function ApiSettingsModal({ isOpen, onClose }: ApiSettingsModalPr
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
             
           <div className="space-y-2">
-            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+            <label className="text-[13px] font-medium text-[#1d1d1f] uppercase tracking-wide">
                 Target Endpoint URL
             </label>
             <div className="relative">
@@ -104,20 +104,20 @@ export default function ApiSettingsModal({ isOpen, onClose }: ApiSettingsModalPr
                     value={endpoint} 
                     onChange={(e) => setEndpoint(e.target.value)}
                     placeholder="https://api.example.com/submit"
-                    className="w-full p-3 pl-10 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
+                    className="w-full p-4 pl-11 bg-[#f5f5f7] border-none rounded-xl text-sm text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3]/20 focus:bg-white outline-none transition-all placeholder-gray-400 font-medium"
                 />
-                <Server className="absolute left-3 top-3 text-gray-400" size={18} />
+                <Server className="absolute left-4 top-4 text-[#86868b]" size={18} />
             </div>
-            <p className="text-xs text-gray-400">
+            <p className="text-[11px] text-[#86868b]">
                 This is where form submissions will be sent (POST request).
             </p>
           </div>
 
           {/* Status Message */}
           {status.message && (
-            <div className={`p-3 rounded-lg text-sm flex items-start gap-2 ${status.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+            <div className={`p-3 rounded-xl text-sm flex items-start gap-2 animate-in fade-in slide-in-from-top-1 ${status.type === 'success' ? 'bg-[#34c759]/10 text-[#34c759]' : 'bg-[#ff3b30]/10 text-[#ff3b30]'}`}>
                 {status.type === 'success' ? <Check size={16} className="mt-0.5" /> : <AlertCircle size={16} className="mt-0.5" />}
-                {status.message}
+                <span className="font-medium">{status.message}</span>
             </div>
           )}
 
@@ -125,7 +125,7 @@ export default function ApiSettingsModal({ isOpen, onClose }: ApiSettingsModalPr
             <button
                 type="submit"
                 disabled={isSaving || isLoading}
-                className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold text-base shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.98]"
+                className="w-full py-3.5 px-4 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full font-semibold text-[15px] shadow-sm hover:shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
                 {isSaving ? (
                     <>
