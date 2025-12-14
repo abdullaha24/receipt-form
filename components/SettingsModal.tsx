@@ -4,7 +4,7 @@ import { Upload, X, Check, AlertCircle, FileSpreadsheet } from 'lucide-react';
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpdateSuccess: () => void; // Callback to trigger re-fetch of products
+  onUpdateSuccess: () => void;
 }
 
 type FormType = 'receipt' | 'production';
@@ -54,9 +54,7 @@ export default function SettingsModal({ isOpen, onClose, onUpdateSuccess }: Sett
       }
 
       setStatus({ type: 'success', message: `Success! Loaded ${data.count} products.` });
-      // Clear file input
       setFile(null);
-      // Trigger parent refresh
       onUpdateSuccess();
     } catch (err: any) {
       setStatus({ type: 'error', message: err.message });
@@ -66,120 +64,160 @@ export default function SettingsModal({ isOpen, onClose, onUpdateSuccess }: Sett
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-[var(--shadow-modal)] w-full max-w-md overflow-hidden animate-scale-in">
         
         {/* Header */}
-        <div className="flex justify-between items-center p-5 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <FileSpreadsheet className="text-blue-600" size={24} />
-            Manage Products
-          </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded-full transition-colors">
-            <X size={20} />
+        <div className="flex justify-between items-center p-5 sm:p-6 border-b border-[var(--apple-gray-200)]">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[var(--apple-blue)]/10 rounded-xl">
+              <FileSpreadsheet className="text-[var(--apple-blue)]" size={22} strokeWidth={1.75} />
+            </div>
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--apple-text)] tracking-tight">
+              Manage Products
+            </h2>
+          </div>
+          <button 
+            onClick={onClose} 
+            className="text-[var(--apple-text-secondary)] hover:text-[var(--apple-text)] 
+              bg-[var(--apple-gray-100)] hover:bg-[var(--apple-gray-200)] p-2.5 rounded-full transition-all duration-200"
+          >
+            <X size={18} strokeWidth={2} />
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b border-gray-100">
-          <button
-            onClick={() => { setActiveTab('receipt'); setStatus({ type: null, message: '' }); }}
-            className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'receipt' ? 'text-blue-600 border-blue-600 bg-blue-50/50' : 'text-gray-500 border-transparent hover:text-gray-700'}`}
-          >
-            Receipt & Issuance
-          </button>
-          <button
-            onClick={() => { setActiveTab('production'); setStatus({ type: null, message: '' }); }}
-            className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'production' ? 'text-blue-600 border-blue-600 bg-blue-50/50' : 'text-gray-500 border-transparent hover:text-gray-700'}`}
-          >
-            Production
-          </button>
+        {/* Segmented Control */}
+        <div className="px-5 sm:px-6 pt-5 sm:pt-6">
+          <div className="flex bg-[var(--apple-gray-100)] p-1 rounded-xl">
+            <button
+              onClick={() => { setActiveTab('receipt'); setStatus({ type: null, message: '' }); }}
+              className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200
+                ${activeTab === 'receipt' 
+                  ? 'bg-white text-[var(--apple-text)] shadow-sm' 
+                  : 'text-[var(--apple-text-secondary)] hover:text-[var(--apple-text)]'
+                }`}
+            >
+              Receipt & Issuance
+            </button>
+            <button
+              onClick={() => { setActiveTab('production'); setStatus({ type: null, message: '' }); }}
+              className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200
+                ${activeTab === 'production' 
+                  ? 'bg-white text-[var(--apple-text)] shadow-sm' 
+                  : 'text-[var(--apple-text-secondary)] hover:text-[var(--apple-text)]'
+                }`}
+            >
+              Production
+            </button>
+          </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-5">
             
-          <div className="space-y-4">
-             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-500 uppercase">Sheet Name</label>
-                    <input 
-                        type="text" 
-                        value={sheetName} 
-                        onChange={(e) => setSheetName(e.target.value)}
-                        placeholder="e.g. Sheet1"
-                        className="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                    />
-                </div>
-                <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-500 uppercase">Column (Letter)</label>
-                    <input 
-                        type="text" 
-                        value={columnRef} 
-                        onChange={(e) => setColumnRef(e.target.value.toUpperCase())}
-                        placeholder="e.g. A"
-                        className="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                    />
-                </div>
-             </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[var(--apple-text)]">Sheet Name</label>
+              <input 
+                type="text" 
+                value={sheetName} 
+                onChange={(e) => setSheetName(e.target.value)}
+                placeholder="e.g. Sheet1"
+                className="w-full py-3 px-4 bg-[var(--apple-gray-100)] border-2 border-transparent rounded-xl 
+                  text-sm text-[var(--apple-text)] font-medium
+                  focus:bg-white focus:border-[var(--apple-blue)] focus:ring-4 focus:ring-[var(--apple-blue)]/10 
+                  transition-all duration-200 outline-none placeholder-[var(--apple-text-secondary)]"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[var(--apple-text)]">Column</label>
+              <input 
+                type="text" 
+                value={columnRef} 
+                onChange={(e) => setColumnRef(e.target.value.toUpperCase())}
+                placeholder="e.g. A"
+                className="w-full py-3 px-4 bg-[var(--apple-gray-100)] border-2 border-transparent rounded-xl 
+                  text-sm text-[var(--apple-text)] font-medium
+                  focus:bg-white focus:border-[var(--apple-blue)] focus:ring-4 focus:ring-[var(--apple-blue)]/10 
+                  transition-all duration-200 outline-none placeholder-[var(--apple-text-secondary)]"
+              />
+            </div>
+          </div>
 
-             <div className="space-y-1">
-                <label className="text-xs font-medium text-gray-500 uppercase">Excel File</label>
-                <div className="relative border-2 border-dashed border-gray-200 rounded-xl p-4 hover:bg-gray-50 hover:border-blue-300 transition-colors text-center cursor-pointer group">
-                    <input 
-                        type="file" 
-                        accept=".xlsx, .xls"
-                        onChange={handleFileChange}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    />
-                    <div className="flex flex-col items-center gap-2">
-                        {file ? (
-                             <>
-                                <FileSpreadsheet className="text-green-500" size={24} />
-                                <span className="text-sm font-medium text-gray-700 truncate max-w-[200px]">{file.name}</span>
-                                <span className="text-xs text-blue-500 group-hover:underline">Click to change</span>
-                             </>
-                        ) : (
-                            <>
-                                <Upload className="text-gray-400 group-hover:text-blue-500 transition-colors" size={24} />
-                                <span className="text-sm text-gray-500">Click to upload Excel file</span>
-                            </>
-                        )}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-[var(--apple-text)]">Excel File</label>
+            <div className="relative border-2 border-dashed border-[var(--apple-gray-300)] rounded-2xl p-6 
+              hover:bg-[var(--apple-gray-50)] hover:border-[var(--apple-blue)]/40 
+              transition-all duration-200 text-center cursor-pointer group">
+              <input 
+                type="file" 
+                accept=".xlsx, .xls"
+                onChange={handleFileChange}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+              <div className="flex flex-col items-center gap-2.5">
+                {file ? (
+                  <>
+                    <div className="bg-emerald-100 p-3 rounded-xl text-emerald-600">
+                      <FileSpreadsheet size={24} strokeWidth={1.75} />
                     </div>
-                </div>
-             </div>
+                    <span className="text-sm font-medium text-[var(--apple-text)] truncate max-w-[200px]">
+                      {file.name}
+                    </span>
+                    <span className="text-xs text-[var(--apple-blue)] font-medium">Click to replace</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="bg-[var(--apple-gray-100)] p-3 rounded-xl text-[var(--apple-text-secondary)] 
+                      group-hover:bg-white group-hover:shadow-sm group-hover:text-[var(--apple-blue)] transition-all duration-200">
+                      <Upload size={24} strokeWidth={1.75} />
+                    </div>
+                    <span className="text-sm text-[var(--apple-text-secondary)] font-medium">
+                      Click to upload Excel file
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Status Message */}
           {status.message && (
-            <div className={`p-3 rounded-lg text-sm flex items-start gap-2 ${status.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                {status.type === 'success' ? <Check size={16} className="mt-0.5" /> : <AlertCircle size={16} className="mt-0.5" />}
-                {status.message}
+            <div className={`p-3.5 rounded-xl text-sm flex items-start gap-2.5 animate-slide-up
+              ${status.type === 'success' 
+                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' 
+                : 'bg-red-50 text-red-600 border border-red-200'
+              }`}
+            >
+              {status.type === 'success' 
+                ? <Check size={18} className="mt-0.5 flex-shrink-0" strokeWidth={2} /> 
+                : <AlertCircle size={18} className="mt-0.5 flex-shrink-0" strokeWidth={2} />
+              }
+              <span className="font-medium">{status.message}</span>
             </div>
           )}
 
-          <div className="pt-2">
-            <button
-                type="submit"
-                disabled={isUploading}
-                className="w-full py-2.5 px-4 bg-gray-900 hover:bg-black text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-                {isUploading ? (
-                    <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Processing...
-                    </>
-                ) : (
-                    <>
-                        Update Product List
-                    </>
-                )}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={isUploading}
+            className="w-full py-3.5 px-4 bg-[var(--apple-blue)] hover:bg-[var(--apple-blue-hover)] text-white 
+              rounded-xl font-semibold text-[15px] shadow-sm hover:shadow-lg transition-all duration-200 
+              active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed 
+              flex items-center justify-center gap-2"
+          >
+            {isUploading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>Processing...</span>
+              </>
+            ) : (
+              <span>Update Product List</span>
+            )}
+          </button>
           
-           <p className="text-xs text-gray-400 text-center">
-              Target: {activeTab === 'receipt' ? 'receipt/issuance' : 'production'} forms
-           </p>
+          <p className="text-xs text-[var(--apple-text-secondary)] text-center">
+            Updates the dropdown list for {activeTab === 'receipt' ? 'Receipt & Issuance' : 'Production Entry'} forms.
+          </p>
 
         </form>
       </div>

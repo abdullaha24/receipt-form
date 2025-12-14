@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import ProductSection from './ProductSection';
 import SettingsModal from './SettingsModal';
-import { Plus, Check, Loader2, Settings } from 'lucide-react';
+import { Plus, Check, Loader2, Settings, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
+import Link from 'next/link';
 
 interface EntryFormProps {
   title: string;
@@ -58,19 +59,28 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
     setProducts([...products, { productName: "", quantity: "", notes: "" }]);
   };
 
-    const removeProductSection = (index: number) => {
-        if (products.length > 1) {
-            const newProducts = products.filter((_, i) => i !== index);
-            setProducts(newProducts);
-        }
-    };
+  const removeProductSection = (index: number) => {
+    if (products.length > 1) {
+      const newProducts = products.filter((_, i) => i !== index);
+      setProducts(newProducts);
+    }
+  };
 
   const getThemeColor = () => {
     switch (type) {
-        case 'receipt': return 'bg-emerald-600 hover:bg-emerald-700 ring-emerald-200';
-        case 'issuance': return 'bg-amber-600 hover:bg-amber-700 ring-amber-200';
-        case 'production': return 'bg-blue-600 hover:bg-blue-700 ring-blue-200';
-        default: return 'bg-blue-600 hover:bg-blue-700 ring-blue-200';
+      case 'receipt': return 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 shadow-lg shadow-emerald-500/25';
+      case 'issuance': return 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-lg shadow-amber-500/25';
+      case 'production': return 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-lg shadow-blue-500/25';
+      default: return 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-lg shadow-blue-500/25';
+    }
+  };
+
+  const getThemeAccent = () => {
+    switch (type) {
+      case 'receipt': return 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border-emerald-200';
+      case 'issuance': return 'text-amber-600 bg-amber-50 hover:bg-amber-100 border-amber-200';
+      case 'production': return 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-200';
+      default: return 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-200';
     }
   };
 
@@ -114,24 +124,8 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
     console.log("Form Submission Payload:", JSON.stringify(payload, null, 2));
 
     try {
-        // 1. Get the configured endpoint
-        const settingsRes = await fetch('/api/settings');
-        if (!settingsRes.ok) {
-            throw new Error("Failed to retrieve API configuration");
-        }
-        const settings = await settingsRes.json();
-        
-        if (!settings.endpoint) {
-            // Warn user if no endpoint is configured, but strictly speaking we might just log it 
-            // or we could treat it as a success for the UI but warn about no upload.
-            // For now, let's alert and stop to ensure they know it didn't go anywhere external.
-            alert("No API endpoint configured! Please set one in the Home screen settings.");
-            setIsSubmitting(false);
-            return;
-        }
-
-        // 2. Send data to the endpoint
-        const uploadRes = await fetch(settings.endpoint, {
+        // 2. Send data to the endpoint via server-side proxy
+        const uploadRes = await fetch('/api/submit-entry', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -164,78 +158,129 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-8 flex justify-between items-start">
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{title}</h1>
-                <p className="mt-2 text-gray-600">Please fill in the details below to record a new {type}.</p>
-            </div>
+    <div className="min-h-screen bg-[var(--apple-bg)] py-6 sm:py-10 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-3xl mx-auto">
+        
+        {/* Header Area */}
+        <div className="mb-8 sm:mb-10">
+          {/* Back button and settings */}
+          <div className="flex justify-between items-center mb-6">
+            <Link 
+              href="/"
+              className="inline-flex items-center gap-2 text-[var(--apple-text-secondary)] hover:text-[var(--apple-text)] 
+                bg-white hover:bg-[var(--apple-gray-100)] px-4 py-2 rounded-full border border-[var(--apple-border)]/50 
+                shadow-[var(--shadow-xs)] transition-all duration-200 text-[15px] font-medium"
+            >
+              <ArrowLeft size={18} strokeWidth={2} />
+              <span>Back</span>
+            </Link>
+            
             <button 
-                onClick={() => setIsSettingsOpen(true)}
-                className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all"
-                title="Open Settings"
+              onClick={() => setIsSettingsOpen(true)}
+              className="p-3 text-[var(--apple-text-secondary)] hover:text-[var(--apple-blue)] 
+                bg-white hover:bg-[var(--apple-blue)]/10 rounded-full border border-[var(--apple-border)]/50 
+                shadow-[var(--shadow-xs)] hover:border-[var(--apple-blue)]/30 transition-all duration-200"
+              title="Manage Products"
             >
-                <Settings size={22} />
+              <Settings size={20} strokeWidth={1.75} />
             </button>
+          </div>
+          
+          {/* Title */}
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-semibold text-[var(--apple-text)] tracking-tight">
+              {title}
+            </h1>
+            <p className="mt-2 text-base sm:text-lg text-[var(--apple-text-secondary)]">
+              Record a new {type} entry.
+            </p>
+          </div>
         </div>
 
-        <Header
-          selectedUser={selectedUser}
-          setSelectedUser={setSelectedUser}
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-        />
-
-        <div className="space-y-4 mb-8">
-            <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex justify-between">
-                <span>Item Details</span>
-                {isLoadingProducts && <span className="text-xs normal-case text-gray-500 flex items-center gap-1"><Loader2 size={12} className="animate-spin" /> Loading products...</span>}
-            </h2>
-            {products.map((product, index) => (
-            <ProductSection
-                key={index}
-                index={index}
-                data={product}
-                updateData={updateProductData}
-                removeSection={removeProductSection}
-                isOnlySection={products.length === 1}
-                availableProducts={availableProducts}
+        {/* Main Form Card */}
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-[var(--shadow-lg)] border border-black/[0.04] overflow-hidden">
+             
+          <div className="p-5 sm:p-8">
+            <Header
+              selectedUser={selectedUser}
+              setSelectedUser={setSelectedUser}
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
             />
-            ))}
-        </div>
 
-        <div className="flex justify-center mb-10">
-            <button
-            onClick={addProductSection}
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium py-2 px-4 rounded-full hover:bg-blue-50 transition-colors border border-dashed border-blue-300 hover:border-blue-400 w-full justify-center"
-            >
-            <Plus size={18} />
-            <span>Add Another Item</span>
-            </button>
-        </div>
-
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] sm:static sm:bg-transparent sm:border-0 sm:shadow-none sm:p-0">
-             <button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className={`w-full py-4 px-6 rounded-xl text-white font-bold text-lg shadow-lg transform transition-all active:scale-[0.98] flex items-center justify-center gap-3 focus:ring-4 ${getThemeColor()} disabled:opacity-70 disabled:cursor-not-allowed`}
-            >
-                {isSubmitting ? (
-                    <>
-                        <Loader2 className="animate-spin" />
-                        Processing...
-                    </>
-                ) : (
-                    <>
-                        Submit {title}
-                        <Check size={20} strokeWidth={3} />
-                    </>
+            {/* Items Section */}
+            <div className="mt-8">
+              <div className="flex justify-between items-center mb-5 pb-3 border-b border-[var(--apple-gray-200)]">
+                <h2 className="text-sm font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider">
+                  Items
+                </h2>
+                {isLoadingProducts && (
+                  <span className="text-xs text-[var(--apple-text-secondary)] flex items-center gap-1.5 animate-pulse-soft">
+                    <Loader2 size={12} className="animate-spin" />
+                    Syncing...
+                  </span>
                 )}
+              </div>
+               
+              <div className="space-y-4">
+                {products.map((product, index) => (
+                  <ProductSection
+                    key={index}
+                    index={index}
+                    data={product}
+                    updateData={updateProductData}
+                    removeSection={removeProductSection}
+                    isOnlySection={products.length === 1}
+                    availableProducts={availableProducts}
+                    accentColor={getThemeAccent()}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Add Item Button */}
+            <div className="flex justify-center mt-6">
+              <button
+                onClick={addProductSection}
+                className={`group flex items-center gap-2.5 font-medium py-2.5 px-5 rounded-full 
+                  border transition-all duration-200 active:scale-95 ${getThemeAccent()}`}
+              >
+                <div className="bg-white rounded-full p-1 shadow-sm group-hover:shadow group-active:scale-90 transition-all">
+                  <Plus size={14} strokeWidth={2.5} />
+                </div>
+                <span className="text-[15px]">Add Another Item</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Submit Footer */}
+          <div className="bg-[var(--apple-gray-50)] p-4 sm:p-6 border-t border-[var(--apple-gray-200)] 
+            flex justify-end sticky bottom-0 z-10 backdrop-blur-xl bg-opacity-90">
+            <button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className={`w-full sm:w-auto py-3.5 px-8 sm:px-10 rounded-xl text-white font-semibold text-base 
+                transform transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2.5 
+                focus:outline-none focus:ring-4 focus:ring-opacity-30 disabled:opacity-60 disabled:cursor-not-allowed 
+                hover:shadow-xl ${getThemeColor()}`}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="animate-spin" size={20} />
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <>
+                  <span>Submit Entry</span>
+                  <Check size={18} strokeWidth={2.5} />
+                </>
+              )}
             </button>
+          </div>
         </div>
-        {/* Spacer for fixed bottom button on mobile */}
-        <div className="h-24 sm:h-0"></div>
+        
+        {/* Mobile spacer */}
+        <div className="h-20 sm:h-0"></div>
       </div>
       
       <SettingsModal 
@@ -246,47 +291,51 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
 
       {/* Success Modal */}
       {showSuccessModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-6 bg-green-50 border-b border-green-100 flex items-center gap-4">
-                <div className="bg-green-100 p-2 rounded-full text-green-600">
-                    <Check size={28} strokeWidth={3} />
-                </div>
-                <div>
-                   <h3 className="text-xl font-bold text-gray-900">Submission Successful</h3>
-                   <p className="text-green-700">The following items have been recorded.</p>
-                </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in">
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-[var(--shadow-modal)] w-full max-w-lg overflow-hidden animate-scale-in border border-white/20">
+            
+            {/* Success Header */}
+            <div className="p-6 bg-gradient-to-br from-emerald-50 to-green-50 border-b border-emerald-100 flex items-center gap-4">
+              <div className="bg-gradient-to-br from-emerald-500 to-green-600 p-3 rounded-2xl text-white shadow-lg shadow-emerald-500/30">
+                <Check size={28} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-[var(--apple-text)] tracking-tight">Success!</h3>
+                <p className="text-[var(--apple-text-secondary)] text-[15px]">Your entry has been recorded.</p>
+              </div>
             </div>
             
-            <div className="p-0 max-h-[60vh] overflow-y-auto">
-                <table className="w-full text-left border-collapse">
-                    <thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
-                        <tr>
-                            <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Product Name</th>
-                            <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Quantity</th>
-                            <th className="py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {submittedProducts.map((p, i) => (
-                            <tr key={i} className="hover:bg-gray-50 transition-colors">
-                                <td className="py-3 px-4 text-sm font-medium text-gray-900">{p.productName}</td>
-                                <td className="py-3 px-4 text-sm text-gray-600">{p.quantity}</td>
-                                <td className="py-3 px-4 text-sm text-gray-500 italic">{p.notes || "-"}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            {/* Products Table */}
+            <div className="max-h-[50vh] overflow-y-auto custom-scrollbar">
+              <table className="w-full text-left">
+                <thead className="bg-[var(--apple-gray-50)] sticky top-0 z-10">
+                  <tr>
+                    <th className="py-3.5 px-5 text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider border-b border-[var(--apple-gray-200)]">Product</th>
+                    <th className="py-3.5 px-5 text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider border-b border-[var(--apple-gray-200)]">Qty</th>
+                    <th className="py-3.5 px-5 text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider border-b border-[var(--apple-gray-200)]">Notes</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--apple-gray-100)]">
+                  {submittedProducts.map((p, i) => (
+                    <tr key={i} className="hover:bg-[var(--apple-gray-50)] transition-colors">
+                      <td className="py-4 px-5 text-[15px] font-medium text-[var(--apple-text)]">{p.productName}</td>
+                      <td className="py-4 px-5 text-[15px] text-[var(--apple-text)] tabular-nums">{p.quantity}</td>
+                      <td className="py-4 px-5 text-sm text-[var(--apple-text-secondary)]">{p.notes || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end">
-                <button
-                    onClick={() => setShowSuccessModal(false)}
-                    className="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-lg transition-colors shadow-sm active:scale-95 flex items-center gap-2"
-                >
-                    <span>OK, Close</span>
-                    <Check size={16} />
-                </button>
+            {/* Modal Footer */}
+            <div className="p-5 border-t border-[var(--apple-gray-200)] bg-[var(--apple-gray-50)] flex justify-end">
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="px-6 py-2.5 bg-[var(--apple-text)] hover:bg-black text-white font-medium text-[15px] 
+                  rounded-xl transition-all duration-200 shadow-sm hover:shadow-md active:scale-95"
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>
