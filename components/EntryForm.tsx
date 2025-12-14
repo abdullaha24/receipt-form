@@ -124,22 +124,8 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
     console.log("Form Submission Payload:", JSON.stringify(payload, null, 2));
 
     try {
-        // 1. Get the configured endpoint
-        const settingsRes = await fetch('/api/settings');
-        if (!settingsRes.ok) {
-            throw new Error("Failed to retrieve API configuration");
-        }
-        const settings = await settingsRes.json();
-        
-        if (!settings.endpoint) {
-            // Warn user if no endpoint is configured
-            alert("No API endpoint configured! Please set one in the Home screen settings.");
-            setIsSubmitting(false);
-            return;
-        }
-
-        // 2. Send data to the endpoint
-        const uploadRes = await fetch(settings.endpoint, {
+        // 2. Send data to the endpoint via server-side proxy
+        const uploadRes = await fetch('/api/submit-entry', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
