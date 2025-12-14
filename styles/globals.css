@@ -3,18 +3,40 @@
 @plugin "tailwindcss-animate";
 
 :root {
-  /* Apple Design System Colors */
+  /* Enterprise Design System Colors */
   --apple-bg: #f5f5f7;
   --apple-card: #ffffff;
   --apple-text: #1d1d1f;
   --apple-text-secondary: #86868b;
-  --apple-border: #d2d2d7; 
+  --apple-border: #d2d2d7;
   --apple-blue: #0071e3;
   --apple-blue-hover: #0077ed;
   --apple-green: #34c759;
   --apple-red: #ff3b30;
+  --apple-orange: #ff9f0a;
+  --apple-gray-50: #fbfbfd;
   --apple-gray-100: #f5f5f7;
-  --apple-gray-200: #e5e5ea;
+  --apple-gray-200: #e8e8ed;
+  --apple-gray-300: #d2d2d7;
+  
+  /* Shadows - premium depth hierarchy */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  
+  /* Card & Modal shadows */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04);
+  --shadow-modal: 0 24px 48px -12px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
   
   --background: var(--apple-bg);
   --foreground: var(--apple-text);
@@ -27,13 +49,27 @@
   --color-apple-gray: var(--apple-gray-100);
   --color-apple-border: var(--apple-border);
   
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 @layer base {
   body {
     @apply bg-[var(--apple-bg)] text-[var(--apple-text)] antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Better focus states for accessibility */
+  *:focus-visible {
+    outline: 2px solid var(--apple-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  
+  /* Smooth transitions everywhere */
+  button, a, input, select, textarea {
+    transition: all var(--transition-base);
   }
 }
 
@@ -44,29 +80,145 @@
 
 .react-datepicker__input-container input {
   width: 100%;
-  padding: 0.75rem 1rem; /* Taller inputs */
-  border-radius: 0.75rem; /* More rounded */
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  font-size: 0.95rem;
+  padding: 1rem 1rem 1rem 3.5rem;
+  border-radius: 0.875rem;
+  border: 2px solid transparent;
+  background: var(--apple-gray-100);
+  outline: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  transition: all var(--transition-base);
+}
+
+.react-datepicker__input-container input:hover {
+  background: var(--apple-gray-200);
+}
+
+.react-datepicker__input-container input:focus {
+  background: white;
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
 }
 
 .react-datepicker-popper {
   z-index: 100 !important;
 }
 
-/* Custom Scrollbar for a cleaner look */
+.react-datepicker {
+  font-family: inherit !important;
+  border: 1px solid var(--apple-gray-200) !important;
+  border-radius: 1rem !important;
+  box-shadow: var(--shadow-xl) !important;
+  overflow: hidden;
+}
+
+.react-datepicker__header {
+  background: var(--apple-gray-50) !important;
+  border-bottom: 1px solid var(--apple-gray-200) !important;
+  padding-top: 0.75rem !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: var(--apple-blue) !important;
+  border-radius: 0.5rem !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: var(--apple-gray-200) !important;
+  border-radius: 0.5rem !important;
+}
+
+/* Premium Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  background: var(--apple-gray-300);
+  border-radius: 100px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: var(--apple-text-secondary);
+}
+
+/* Custom scrollbar for containers */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--apple-gray-200);
+}
+
+/* Smooth animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--transition-base) ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp var(--transition-slow) ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--transition-base) ease-out;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Glass morphism effect for modals */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Card hover effect utility */
+.card-hover {
+  transition: all var(--transition-slow);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
 }
