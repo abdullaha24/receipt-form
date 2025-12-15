@@ -114,7 +114,7 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
             formType: type,
             user: selectedUser,
             date: format(selectedDate, 'yyyy-MM-dd'),
-            submissionTimestamp: new Date().toISOString()
+            submissionTimestamp: format(new Date(), 'MM/dd/yyyy HH:mm:ss')
         },
         body: {
             products: products
