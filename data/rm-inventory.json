@@ -1,0 +1,60 @@
+{
+  "lastUpdated": "23 Dec 2025 21:15",
+  "items": [
+    {
+      "row_number": 2,
+      "MATERIAL GROUP": "CEMENT",
+      "SKU Code": "300-100",
+      "Material Description": "CEMENT GREY 50KG",
+      "UOM": "BAG",
+      "Opening Stock": 437,
+      "Today's In": 0,
+      "Today's Out": 254,
+      "Closing Stock": 183
+    },
+    {
+      "row_number": 3,
+      "MATERIAL GROUP": "CEMENT",
+      "SKU Code": "300-101",
+      "Material Description": "CEMENT WHITE 40KG",
+      "UOM": "BAG",
+      "Opening Stock": 155,
+      "Today's In": 0,
+      "Today's Out": 0,
+      "Closing Stock": 155
+    },
+    {
+      "row_number": 6,
+      "MATERIAL GROUP": "SILICA SAND",
+      "SKU Code": "300-104",
+      "Material Description": "SILICA BOND WAALA",
+      "UOM": "KG",
+      "Opening Stock": 25251,
+      "Today's In": 40390,
+      "Today's Out": 14925,
+      "Closing Stock": 50716
+    },
+    {
+      "row_number": 7,
+      "MATERIAL GROUP": "SILICA SAND",
+      "SKU Code": "300-105",
+      "Material Description": "SILICA (MOTA - KARACHI)",
+      "UOM": "KG",
+      "Opening Stock": -9320,
+      "Today's In": 0,
+      "Today's Out": 0,
+      "Closing Stock": -9320
+    },
+    {
+      "row_number": 10,
+      "MATERIAL GROUP": "FILLERS",
+      "SKU Code": "300-107",
+      "Material Description": "CHANNIPUL POWDER",
+      "UOM": "KG",
+      "Opening Stock": 765,
+      "Today's In": 0,
+      "Today's Out": 0,
+      "Closing Stock": 765
+    }
+  ]
+}

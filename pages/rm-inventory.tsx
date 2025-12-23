@@ -1,41 +1,76 @@
 import Head from "next/head";
 import Link from "next/link";
-import { ArrowLeft, Package, ChevronDown, RefreshCw } from 'lucide-react';
-import { useState } from 'react';
-
-// Dummy data for demonstration
-const DUMMY_DATE = "23 December 2024";
-const DUMMY_LAST_REFRESHED = "2 minutes ago";
-
-const DUMMY_CATEGORIES = [
-  "All Categories",
-  "Chemicals",
-  "Packaging",
-  "Raw Powders",
-  "Additives",
-];
+import { ArrowLeft, Package, ChevronDown, RefreshCw, Loader2, AlertCircle } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
 
 interface InventoryItem {
-  item: string;
-  unit: string;
-  in: number;
-  out: number;
-  stock: number;
+  row_number: number;
+  "MATERIAL GROUP": string;
+  "SKU Code": string;
+  "Material Description": string;
+  "UOM": string;
+  "Opening Stock": number;
+  "Today's In": number;
+  "Today's Out": number;
+  "Closing Stock": number;
 }
 
-const DUMMY_INVENTORY: InventoryItem[] = [
-  { item: "Cement Grade A", unit: "Kg", in: 5000, out: 1200, stock: 3800 },
-  { item: "Calcium Chloride", unit: "Kg", in: 800, out: 250, stock: 550 },
-  { item: "Silica Sand Fine", unit: "Kg", in: 3000, out: 1800, stock: 1200 },
-  { item: "Polymer Resin X1", unit: "L", in: 500, out: 120, stock: 380 },
-  { item: "Packing Bags 25kg", unit: "Pcs", in: 2000, out: 850, stock: 1150 },
-  { item: "Plasticizer Type B", unit: "L", in: 200, out: 75, stock: 125 },
-  { item: "Fiber Reinforcement", unit: "Kg", in: 400, out: 180, stock: 220 },
-  { item: "Retarder Compound", unit: "Kg", in: 150, out: 45, stock: 105 },
-];
+interface InventoryData {
+  lastUpdated: string | null;
+  items: InventoryItem[];
+}
 
 export default function RMInventory() {
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch inventory data on mount
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const res = await fetch('/api/rm-inventory');
+        if (!res.ok) {
+          throw new Error('Failed to fetch inventory');
+        }
+        const data: InventoryData = await res.json();
+        setInventory(data.items || []);
+        setLastUpdated(data.lastUpdated);
+      } catch (err: any) {
+        console.error('Error fetching inventory:', err);
+        setError(err.message || 'Failed to load inventory');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInventory();
+  }, []);
+
+  // Derive unique categories from data
+  const categories = useMemo(() => {
+    const uniqueGroups = new Set(inventory.map(item => item["MATERIAL GROUP"]));
+    return ["All Categories", ...Array.from(uniqueGroups).sort()];
+  }, [inventory]);
+
+  // Filter items by selected category
+  const filteredItems = useMemo(() => {
+    if (selectedCategory === "All Categories") {
+      return inventory;
+    }
+    return inventory.filter(item => item["MATERIAL GROUP"] === selectedCategory);
+  }, [inventory, selectedCategory]);
+
+  // Get today's date formatted
+  const todayDate = new Date().toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
 
   return (
     <div className="min-h-screen bg-[var(--apple-bg)] font-sans">
@@ -75,11 +110,13 @@ export default function RMInventory() {
           {/* Date and Last Refreshed */}
           <div className="mt-4 space-y-1">
             <p className="text-lg sm:text-xl text-[var(--apple-text)] font-medium">
-              {DUMMY_DATE}
+              {todayDate}
             </p>
             <p className="text-sm text-[var(--apple-text-secondary)] italic flex items-center gap-1.5">
               <RefreshCw size={12} strokeWidth={2} />
-              Last refreshed: {DUMMY_LAST_REFRESHED}
+              {lastUpdated 
+                ? `Last refreshed: ${lastUpdated}` 
+                : 'No data received yet'}
             </p>
           </div>
         </div>
@@ -99,7 +136,7 @@ export default function RMInventory() {
                   focus:border-[var(--apple-blue)] focus:ring-4 focus:ring-[var(--apple-blue)]/10 
                   hover:border-[var(--apple-gray-300)] transition-all duration-200 outline-none appearance-none cursor-pointer"
               >
-                {DUMMY_CATEGORIES.map((category) => (
+                {categories.map((category) => (
                   <option key={category} value={category}>
                     {category}
                   </option>
@@ -112,103 +149,151 @@ export default function RMInventory() {
           </div>
         </div>
 
-        {/* Inventory Table */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-[var(--shadow-lg)] border border-black/[0.04] overflow-hidden">
-          
-          {/* Desktop Table */}
-          <div className="hidden sm:block overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-[var(--apple-gray-50)] border-b border-[var(--apple-gray-200)]">
-                <tr>
-                  <th className="py-4 px-6 text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider">
-                    Item
-                  </th>
-                  <th className="py-4 px-6 text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider text-center">
-                    Unit
-                  </th>
-                  <th className="py-4 px-6 text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider text-right">
-                    In
-                  </th>
-                  <th className="py-4 px-6 text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider text-right">
-                    Out
-                  </th>
-                  <th className="py-4 px-6 text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider text-right">
-                    Stock
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--apple-gray-100)]">
-                {DUMMY_INVENTORY.map((item, index) => (
-                  <tr key={index} className="hover:bg-[var(--apple-gray-50)] transition-colors">
-                    <td className="py-4 px-6">
-                      <span className="text-[15px] font-medium text-[var(--apple-text)]">
-                        {item.item}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-center">
-                      <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-lg 
-                        bg-[var(--apple-gray-100)] text-xs font-semibold text-[var(--apple-text-secondary)] uppercase">
-                        {item.unit}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      <span className="text-[15px] font-medium text-emerald-600 tabular-nums">
-                        +{item.in.toLocaleString()}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      <span className="text-[15px] font-medium text-amber-600 tabular-nums">
-                        −{item.out.toLocaleString()}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      <span className="text-[15px] font-semibold text-[var(--apple-text)] tabular-nums">
-                        {item.stock.toLocaleString()}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* Loading State */}
+        {isLoading && (
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-[var(--shadow-lg)] border border-black/[0.04] p-12 flex flex-col items-center justify-center gap-4">
+            <Loader2 className="w-8 h-8 text-[var(--apple-blue)] animate-spin" />
+            <p className="text-[var(--apple-text-secondary)] font-medium">Loading inventory...</p>
           </div>
+        )}
 
-          {/* Mobile Card View */}
-          <div className="sm:hidden divide-y divide-[var(--apple-gray-100)]">
-            {DUMMY_INVENTORY.map((item, index) => (
-              <div key={index} className="p-4 hover:bg-[var(--apple-gray-50)] transition-colors">
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-[15px] font-semibold text-[var(--apple-text)] flex-1 pr-3">
-                    {item.item}
-                  </h3>
-                  <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-lg 
-                    bg-[var(--apple-gray-100)] text-xs font-semibold text-[var(--apple-text-secondary)] uppercase shrink-0">
-                    {item.unit}
-                  </span>
-                </div>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-emerald-50 rounded-xl p-3 text-center">
-                    <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wide mb-1">In</p>
-                    <p className="text-base font-semibold text-emerald-600 tabular-nums">
-                      +{item.in.toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="bg-amber-50 rounded-xl p-3 text-center">
-                    <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Out</p>
-                    <p className="text-base font-semibold text-amber-600 tabular-nums">
-                      −{item.out.toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="bg-[var(--apple-gray-100)] rounded-xl p-3 text-center">
-                    <p className="text-[10px] font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wide mb-1">Stock</p>
-                    <p className="text-base font-bold text-[var(--apple-text)] tabular-nums">
-                      {item.stock.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
+        {/* Error State */}
+        {error && !isLoading && (
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-[var(--shadow-lg)] border border-red-200 p-8 flex flex-col items-center justify-center gap-3">
+            <div className="bg-red-100 p-3 rounded-xl">
+              <AlertCircle className="w-6 h-6 text-red-500" />
+            </div>
+            <p className="text-red-600 font-medium">{error}</p>
           </div>
-        </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && !error && inventory.length === 0 && (
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-[var(--shadow-lg)] border border-black/[0.04] p-12 flex flex-col items-center justify-center gap-4">
+            <div className="bg-[var(--apple-gray-100)] p-4 rounded-2xl">
+              <Package className="w-8 h-8 text-[var(--apple-text-secondary)]" />
+            </div>
+            <div className="text-center">
+              <p className="text-[var(--apple-text)] font-semibold mb-1">No inventory data</p>
+              <p className="text-[var(--apple-text-secondary)] text-sm">Waiting for data to be posted to this endpoint.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Inventory Table */}
+        {!isLoading && !error && filteredItems.length > 0 && (
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-[var(--shadow-lg)] border border-black/[0.04] overflow-hidden">
+            
+            {/* Desktop Table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-[var(--apple-gray-50)] border-b border-[var(--apple-gray-200)]">
+                  <tr>
+                    <th className="py-4 px-6 text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider">
+                      Item
+                    </th>
+                    <th className="py-4 px-6 text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider text-center">
+                      Unit
+                    </th>
+                    <th className="py-4 px-6 text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider text-right">
+                      In
+                    </th>
+                    <th className="py-4 px-6 text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider text-right">
+                      Out
+                    </th>
+                    <th className="py-4 px-6 text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider text-right">
+                      Stock
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--apple-gray-100)]">
+                  {filteredItems.map((item, index) => (
+                    <tr key={item["SKU Code"] || index} className="hover:bg-[var(--apple-gray-50)] transition-colors">
+                      <td className="py-4 px-6">
+                        <span className="text-[15px] font-medium text-[var(--apple-text)]">
+                          {item["Material Description"]}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-lg 
+                          bg-[var(--apple-gray-100)] text-xs font-semibold text-[var(--apple-text-secondary)] uppercase">
+                          {item.UOM}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <span className="text-[15px] font-medium text-emerald-600 tabular-nums">
+                          +{item["Today's In"].toLocaleString()}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <span className="text-[15px] font-medium text-amber-600 tabular-nums">
+                          −{item["Today's Out"].toLocaleString()}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <span className={`text-[15px] font-semibold tabular-nums ${
+                          item["Closing Stock"] < 0 ? 'text-red-600' : 'text-[var(--apple-text)]'
+                        }`}>
+                          {item["Closing Stock"].toLocaleString()}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="sm:hidden divide-y divide-[var(--apple-gray-100)]">
+              {filteredItems.map((item, index) => (
+                <div key={item["SKU Code"] || index} className="p-4 hover:bg-[var(--apple-gray-50)] transition-colors">
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-[15px] font-semibold text-[var(--apple-text)] flex-1 pr-3">
+                      {item["Material Description"]}
+                    </h3>
+                    <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-lg 
+                      bg-[var(--apple-gray-100)] text-xs font-semibold text-[var(--apple-text-secondary)] uppercase shrink-0">
+                      {item.UOM}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-emerald-50 rounded-xl p-3 text-center">
+                      <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wide mb-1">In</p>
+                      <p className="text-base font-semibold text-emerald-600 tabular-nums">
+                        +{item["Today's In"].toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="bg-amber-50 rounded-xl p-3 text-center">
+                      <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Out</p>
+                      <p className="text-base font-semibold text-amber-600 tabular-nums">
+                        −{item["Today's Out"].toLocaleString()}
+                      </p>
+                    </div>
+                    <div className={`rounded-xl p-3 text-center ${
+                      item["Closing Stock"] < 0 ? 'bg-red-50' : 'bg-[var(--apple-gray-100)]'
+                    }`}>
+                      <p className={`text-[10px] font-semibold uppercase tracking-wide mb-1 ${
+                        item["Closing Stock"] < 0 ? 'text-red-600' : 'text-[var(--apple-text-secondary)]'
+                      }`}>Stock</p>
+                      <p className={`text-base font-bold tabular-nums ${
+                        item["Closing Stock"] < 0 ? 'text-red-600' : 'text-[var(--apple-text)]'
+                      }`}>
+                        {item["Closing Stock"].toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Items count */}
+        {!isLoading && !error && filteredItems.length > 0 && (
+          <p className="mt-4 text-sm text-[var(--apple-text-secondary)] text-center">
+            Showing {filteredItems.length} of {inventory.length} items
+          </p>
+        )}
 
         {/* Footer Spacer for mobile */}
         <div className="h-10 sm:h-0"></div>
