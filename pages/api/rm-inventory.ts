@@ -2,6 +2,15 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
 
+// Increase body size limit for large inventory payloads
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+};
+
 const DATA_DIR = path.join(process.cwd(), 'data');
 const INVENTORY_FILE = path.join(DATA_DIR, 'rm-inventory.json');
 
