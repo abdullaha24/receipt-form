@@ -22,7 +22,7 @@ export default function handler(
   // Mapping logic must match the upload logic
   if (type === 'receipt' || type === 'issuance') {
       filename = 'products-receipt.json';
-  } else if (type === 'production') {
+  } else if (type === 'production' || type === 'dc-entry') {
       filename = 'products-production.json';
   } else {
       // Return empty or error? Empty list is safer for UI.

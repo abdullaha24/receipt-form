@@ -7,6 +7,7 @@ import {
   Factory,
   Settings,
   Package,
+  Truck,
 } from "lucide-react";
 import { useState } from "react";
 import ApiSettingsModal from "../components/ApiSettingsModal";
@@ -53,6 +54,16 @@ export default function Home() {
       iconBg: "bg-gradient-to-br from-blue-500 to-indigo-600",
       hoverBorder: "hover:border-blue-400/50",
       hoverShadow: "hover:shadow-blue-500/10",
+    },
+    {
+      title: "DC Entry",
+      description: "Record delivery challan entries.",
+      link: "/dc-entry",
+      icon: <Truck className="w-7 h-7" />,
+      gradient: "from-cyan-500 to-teal-600",
+      iconBg: "bg-gradient-to-br from-cyan-500 to-teal-600",
+      hoverBorder: "hover:border-cyan-400/50",
+      hoverShadow: "hover:shadow-cyan-500/10",
     },
   ];
 

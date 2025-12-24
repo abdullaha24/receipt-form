@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 interface EntryFormProps {
   title: string;
-  type: 'receipt' | 'issuance' | 'production';
+  type: 'receipt' | 'issuance' | 'production' | 'dc-entry';
 }
 
 interface ProductData {
@@ -20,6 +20,8 @@ interface ProductData {
 const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
   const [selectedUser, setSelectedUser] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [billNumber, setBillNumber] = useState("");
+  const [dcNumber, setDcNumber] = useState("");
   const [products, setProducts] = useState<ProductData[]>([
     { productName: "", quantity: "", notes: "" }
   ]);
@@ -33,7 +35,9 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
   const fetchProducts = async () => {
     setIsLoadingProducts(true);
     try {
-        const res = await fetch(`/api/products?type=${type}`);
+        // dc-entry uses the same products as production
+        const fetchType = type === 'dc-entry' ? 'production' : type;
+        const res = await fetch(`/api/products?type=${fetchType}`);
         if(res.ok) {
             const data = await res.json();
             setAvailableProducts(data || []);
@@ -71,6 +75,7 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
       case 'receipt': return 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 shadow-lg shadow-emerald-500/25';
       case 'issuance': return 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-lg shadow-amber-500/25';
       case 'production': return 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-lg shadow-blue-500/25';
+      case 'dc-entry': return 'bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-600 hover:to-teal-700 shadow-lg shadow-cyan-500/25';
       default: return 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-lg shadow-blue-500/25';
     }
   };
@@ -80,6 +85,7 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
       case 'receipt': return 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border-emerald-200';
       case 'issuance': return 'text-amber-600 bg-amber-50 hover:bg-amber-100 border-amber-200';
       case 'production': return 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-200';
+      case 'dc-entry': return 'text-cyan-600 bg-cyan-50 hover:bg-cyan-100 border-cyan-200';
       default: return 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-200';
     }
   };
@@ -93,6 +99,18 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
     if (!selectedDate) {
         alert("Please select a Date.");
         return;
+    }
+    
+    // Validate DC Entry specific fields
+    if (type === 'dc-entry') {
+        if (!billNumber.trim()) {
+            alert("Please enter a Bill #.");
+            return;
+        }
+        if (!dcNumber.trim()) {
+            alert("Please enter a DC #.");
+            return;
+        }
     }
     
     for (let i = 0; i < products.length; i++) {
@@ -114,6 +132,7 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
             formType: type,
             user: selectedUser,
             date: format(selectedDate, 'yyyy-MM-dd'),
+            ...(type === 'dc-entry' && { billNumber, dcNumber }),
             submissionTimestamp: format(new Date(), 'MM/dd/yyyy HH:mm:ss')
         },
         body: {
@@ -147,6 +166,8 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
         // Reset Form
         setSelectedUser("");
         setSelectedDate(new Date());
+        setBillNumber("");
+        setDcNumber("");
         setProducts([{ productName: "", quantity: "", notes: "" }]);
 
     } catch (error: any) {
@@ -206,6 +227,12 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
               setSelectedUser={setSelectedUser}
               selectedDate={selectedDate}
               setSelectedDate={setSelectedDate}
+              {...(type === 'dc-entry' && {
+                billNumber,
+                setBillNumber,
+                dcNumber,
+                setDcNumber
+              })}
             />
 
             {/* Items Section */}
