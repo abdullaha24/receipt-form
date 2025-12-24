@@ -90,7 +90,7 @@ export default function Home() {
         </div>
 
         {/* Title */}
-        <span className="flex-1 font-semibold text-[15px] text-[var(--apple-text)] truncate">
+        <span className="flex-1 font-semibold text-[15px] text-[var(--apple-text)]">
           {card.title}
         </span>
 
@@ -145,7 +145,7 @@ export default function Home() {
             <h2 className="text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider mb-3 px-1">
               Entry Forms
             </h2>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {entryFormCards.map((card) => (
                 <CompactTile key={card.title} card={card} />
               ))}
@@ -157,7 +157,7 @@ export default function Home() {
             <h2 className="text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider mb-3 px-1">
               View Inventory
             </h2>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {viewInventoryCards.map((card) => (
                 <CompactTile key={card.title} card={card} />
               ))}
