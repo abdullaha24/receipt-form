@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import ApiSettingsModal from "../components/ApiSettingsModal";
+import Logo from "../components/Logo";
 
 export default function Home() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -116,8 +117,9 @@ export default function Home() {
         <meta name="description" content="Central hub for factory tracking" />
       </Head>
 
-      {/* Header with settings button */}
-      <header className="w-full px-4 sm:px-8 py-3 flex justify-end">
+      {/* Header with logo and settings */}
+      <header className="w-full px-4 sm:px-8 py-3 flex justify-between items-center">
+        <Logo size="md" />
         <button
           onClick={() => setIsSettingsOpen(true)}
           className="p-2.5 text-[var(--apple-text-secondary)] hover:text-[var(--apple-blue)] hover:bg-[var(--apple-blue)]/10 rounded-full transition-all duration-200 active:scale-95"

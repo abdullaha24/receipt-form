@@ -5,6 +5,7 @@ import SettingsModal from './SettingsModal';
 import { Plus, Check, Loader2, Settings, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import Logo from './Logo';
 
 interface EntryFormProps {
   title: string;
@@ -186,15 +187,18 @@ const EntryForm: React.FC<EntryFormProps> = ({ title, type }) => {
         <div className="mb-8 sm:mb-10">
           {/* Back button and settings */}
           <div className="flex justify-between items-center mb-6">
-            <Link 
-              href="/"
-              className="inline-flex items-center gap-2 text-[var(--apple-text-secondary)] hover:text-[var(--apple-text)] 
-                bg-white hover:bg-[var(--apple-gray-100)] px-4 py-2 rounded-full border border-[var(--apple-border)]/50 
-                shadow-[var(--shadow-xs)] transition-all duration-200 text-[15px] font-medium"
-            >
-              <ArrowLeft size={18} strokeWidth={2} />
-              <span>Back</span>
-            </Link>
+            <div className="flex items-center gap-3">
+              <Logo size="sm" />
+              <Link 
+                href="/"
+                className="inline-flex items-center gap-2 text-[var(--apple-text-secondary)] hover:text-[var(--apple-text)] 
+                  bg-white hover:bg-[var(--apple-gray-100)] px-4 py-2 rounded-full border border-[var(--apple-border)]/50 
+                  shadow-[var(--shadow-xs)] transition-all duration-200 text-[15px] font-medium"
+              >
+                <ArrowLeft size={18} strokeWidth={2} />
+                <span>Back</span>
+              </Link>
+            </div>
             
             <button 
               onClick={() => setIsSettingsOpen(true)}
