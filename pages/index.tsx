@@ -1,60 +1,114 @@
 import Head from "next/head";
 import Link from "next/link";
 import {
-  ArrowRight,
+  ChevronRight,
   Inbox,
   Send,
   Factory,
   Settings,
   Package,
+  Truck,
+  Box,
 } from "lucide-react";
 import { useState } from "react";
 import ApiSettingsModal from "../components/ApiSettingsModal";
+import Logo from "../components/Logo";
 
 export default function Home() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const cards = [
-    {
-      title: "Raw Material Inventory",
-      description: "View current stock levels and material movements.",
-      link: "/rm-inventory",
-      icon: <Package className="w-7 h-7" />,
-      gradient: "from-violet-500 to-purple-600",
-      iconBg: "bg-gradient-to-br from-violet-500 to-purple-600",
-      hoverBorder: "hover:border-violet-400/50",
-      hoverShadow: "hover:shadow-violet-500/10",
-    },
+
+  // Entry Forms Section
+  const entryFormCards = [
     {
       title: "Material Receipt",
-      description: "Record incoming raw materials and inventory.",
       link: "/receipt",
-      icon: <Inbox className="w-7 h-7" />,
-      gradient: "from-emerald-500 to-green-600",
+      icon: <Inbox className="w-5 h-5" />,
       iconBg: "bg-gradient-to-br from-emerald-500 to-green-600",
-      hoverBorder: "hover:border-emerald-400/50",
-      hoverShadow: "hover:shadow-emerald-500/10",
+      hoverBg: "group-hover:bg-emerald-50",
     },
     {
       title: "Material Issuance",
-      description: "Log materials issued for production or usage.",
       link: "/issuance",
-      icon: <Send className="w-7 h-7" />,
-      gradient: "from-amber-500 to-orange-600",
+      icon: <Send className="w-5 h-5" />,
       iconBg: "bg-gradient-to-br from-amber-500 to-orange-600",
-      hoverBorder: "hover:border-amber-400/50",
-      hoverShadow: "hover:shadow-amber-500/10",
+      hoverBg: "group-hover:bg-amber-50",
     },
     {
       title: "Production Entry",
-      description: "Enter daily finished goods production data.",
       link: "/production-entry",
-      icon: <Factory className="w-7 h-7" />,
-      gradient: "from-blue-500 to-indigo-600",
+      icon: <Factory className="w-5 h-5" />,
       iconBg: "bg-gradient-to-br from-blue-500 to-indigo-600",
-      hoverBorder: "hover:border-blue-400/50",
-      hoverShadow: "hover:shadow-blue-500/10",
+      hoverBg: "group-hover:bg-blue-50",
+    },
+    {
+      title: "DC Entry",
+      link: "/dc-entry",
+      icon: <Truck className="w-5 h-5" />,
+      iconBg: "bg-gradient-to-br from-cyan-500 to-teal-600",
+      hoverBg: "group-hover:bg-cyan-50",
     },
   ];
+
+  // View Inventory Section
+  const viewInventoryCards = [
+    {
+      title: "RM Inventory",
+      link: "/rm-inventory",
+      icon: <Package className="w-5 h-5" />,
+      iconBg: "bg-gradient-to-br from-violet-500 to-purple-600",
+      hoverBg: "group-hover:bg-violet-50",
+      disabled: false,
+    },
+    {
+      title: "FG Inventory",
+      link: "#",
+      icon: <Box className="w-5 h-5" />,
+      iconBg: "bg-gradient-to-br from-slate-400 to-slate-500",
+      hoverBg: "",
+      disabled: true,
+      badge: "Soon",
+    },
+  ];
+
+  // Reusable compact tile component
+  const CompactTile = ({ card }: { card: typeof entryFormCards[0] & { disabled?: boolean; badge?: string } }) => (
+    <Link
+      href={card.link}
+      className={`group ${card.disabled ? "pointer-events-none" : ""}`}
+    >
+      <div
+        className={`flex items-center gap-4 px-4 py-3.5 bg-white rounded-2xl border border-[var(--apple-border)]/40
+          shadow-[var(--shadow-sm)] transition-all duration-200
+          ${card.disabled ? "opacity-50" : `${card.hoverBg} hover:shadow-md hover:border-[var(--apple-border)]`}
+          ${card.disabled ? "cursor-default" : "cursor-pointer active:scale-[0.98]"}`}
+      >
+        {/* Icon */}
+        <div
+          className={`${card.iconBg} p-2.5 rounded-xl text-white shadow-md shrink-0
+            ${card.disabled ? "" : "group-hover:shadow-lg group-hover:scale-105"} transition-all duration-200`}
+        >
+          {card.icon}
+        </div>
+
+        {/* Title */}
+        <span className="flex-1 font-semibold text-[15px] text-[var(--apple-text)]">
+          {card.title}
+        </span>
+
+        {/* Badge or Arrow */}
+        {card.badge ? (
+          <span className="px-2 py-0.5 text-[10px] font-bold text-slate-400 bg-slate-100 rounded-full uppercase tracking-wider shrink-0">
+            {card.badge}
+          </span>
+        ) : (
+          <ChevronRight
+            className="w-5 h-5 text-[var(--apple-text-secondary)] shrink-0
+              group-hover:text-[var(--apple-blue)] group-hover:translate-x-0.5 transition-all duration-200"
+          />
+        )}
+      </div>
+    </Link>
+  );
 
   return (
     <div className="min-h-screen bg-[var(--apple-bg)] flex flex-col">
@@ -63,76 +117,58 @@ export default function Home() {
         <meta name="description" content="Central hub for factory tracking" />
       </Head>
 
-      {/* Header with settings button */}
-      <header className="w-full px-4 sm:px-8 py-4 flex justify-end">
+      {/* Header with logo and settings */}
+      <header className="w-full px-4 sm:px-8 py-3 flex justify-between items-center">
+        <Logo size="md" />
         <button
           onClick={() => setIsSettingsOpen(true)}
-          className="p-3 text-[var(--apple-text-secondary)] hover:text-[var(--apple-blue)] hover:bg-[var(--apple-blue)]/10 rounded-full transition-all duration-200 active:scale-95"
+          className="p-2.5 text-[var(--apple-text-secondary)] hover:text-[var(--apple-blue)] hover:bg-[var(--apple-blue)]/10 rounded-full transition-all duration-200 active:scale-95"
           title="API Settings"
         >
-          <Settings size={24} strokeWidth={1.75} />
+          <Settings size={22} strokeWidth={1.75} />
         </button>
       </header>
 
       {/* Main content */}
-      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 pb-12">
-        <div className="max-w-5xl w-full">
+      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 pb-8">
+        <div className="max-w-xl w-full">
           {/* Title Section */}
-          <div className="text-center mb-14">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[var(--apple-text)] tracking-tight mb-4 leading-tight">
+          <div className="text-center mb-10 sm:mb-12">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[var(--apple-text)] tracking-tight leading-tight">
               Rawat Factory
-              <span className="block text-[var(--apple-text-secondary)] font-normal text-3xl sm:text-4xl lg:text-5xl mt-2">
-                Data Entry System
-              </span>
             </h1>
-            <p className="text-lg sm:text-xl text-[var(--apple-text-secondary)] font-normal mt-6 max-w-2xl mx-auto">
-              Select an action below to get started.
+            <p className="text-xl sm:text-2xl text-[var(--apple-text-secondary)] font-normal mt-1">
+              Data Entry System
             </p>
           </div>
 
-          {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
-            {cards.map((card) => (
-              <Link href={card.link} key={card.title} className="group">
-                <div
-                  className={`h-full bg-white p-7 sm:p-8 rounded-2xl border border-[var(--apple-border)]/50 
-                    shadow-[var(--shadow-card)] transition-all duration-300 
-                    ${card.hoverBorder} ${card.hoverShadow}
-                    hover:shadow-xl hover:-translate-y-1
-                    flex flex-col items-center text-center cursor-pointer`}
-                >
-                  {/* Icon */}
-                  <div
-                    className={`${card.iconBg} p-4 rounded-2xl mb-6 text-white shadow-lg 
-                    group-hover:scale-110 group-hover:shadow-xl transition-all duration-300`}
-                  >
-                    {card.icon}
-                  </div>
+          {/* Entry Forms Section */}
+          <section className="mb-8">
+            <h2 className="text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider mb-3 px-1">
+              Entry Forms
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {entryFormCards.map((card) => (
+                <CompactTile key={card.title} card={card} />
+              ))}
+            </div>
+          </section>
 
-                  {/* Content */}
-                  <h3 className="text-xl font-semibold text-[var(--apple-text)] mb-2 tracking-tight">
-                    {card.title}
-                  </h3>
-                  <p className="text-[var(--apple-text-secondary)] text-[15px] leading-relaxed mb-6 flex-grow">
-                    {card.description}
-                  </p>
-
-                  {/* Action Link */}
-                  <div
-                    className="flex items-center gap-2 text-[var(--apple-blue)] font-medium text-[15px] 
-                    group-hover:gap-3 transition-all duration-200"
-                  >
-                    <span>Open Form</span>
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {/* View Inventory Section */}
+          <section>
+            <h2 className="text-xs font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider mb-3 px-1">
+              View Inventory
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {viewInventoryCards.map((card) => (
+                <CompactTile key={card.title} card={card} />
+              ))}
+            </div>
+          </section>
 
           {/* Footer */}
-          <footer className="mt-16 text-center">
-            <p className="text-[var(--apple-text-secondary)] text-sm">
+          <footer className="mt-12 text-center">
+            <p className="text-[var(--apple-text-secondary)] text-xs">
               &copy; {new Date().getFullYear()} Mitchell Construction Chemicals
             </p>
           </footer>

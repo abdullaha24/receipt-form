@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { ArrowLeft, Package, ChevronDown, RefreshCw, Loader2, AlertCircle } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
+import Logo from '../components/Logo';
 
 interface InventoryItem {
   row_number: number;
@@ -83,15 +84,18 @@ export default function RMInventory() {
         
         {/* Header Navigation */}
         <div className="flex justify-between items-center mb-8 sm:mb-10">
-          <Link 
-            href="/"
-            className="inline-flex items-center gap-2 text-[var(--apple-text-secondary)] hover:text-[var(--apple-text)] 
-              bg-white hover:bg-[var(--apple-gray-100)] px-4 py-2 rounded-full border border-[var(--apple-border)]/50 
-              shadow-[var(--shadow-xs)] transition-all duration-200 text-[15px] font-medium"
-          >
-            <ArrowLeft size={18} strokeWidth={2} />
-            <span>Back</span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Logo size="sm" />
+            <Link 
+              href="/"
+              className="inline-flex items-center gap-2 text-[var(--apple-text-secondary)] hover:text-[var(--apple-text)] 
+                bg-white hover:bg-[var(--apple-gray-100)] px-4 py-2 rounded-full border border-[var(--apple-border)]/50 
+                shadow-[var(--shadow-xs)] transition-all duration-200 text-[15px] font-medium"
+            >
+              <ArrowLeft size={18} strokeWidth={2} />
+              <span>Back</span>
+            </Link>
+          </div>
         </div>
 
         {/* Page Header */}
