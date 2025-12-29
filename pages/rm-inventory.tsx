@@ -9,6 +9,8 @@ import {
   AlertCircle,
   Search,
   X,
+  ArrowDownCircle,
+  ArrowUpCircle,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import Logo from "../components/Logo";
@@ -33,6 +35,8 @@ interface InventoryData {
 export default function RMInventory() {
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [searchTerm, setSearchTerm] = useState("");
+  const [showOnlyIn, setShowOnlyIn] = useState(false);
+  const [showOnlyOut, setShowOnlyOut] = useState(false);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -79,9 +83,13 @@ export default function RMInventory() {
       const matchesSearch = item["Material Description"]
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
-      return matchesCategory && matchesSearch;
+      
+      const matchesActivityIn = !showOnlyIn || item["Today's In"] > 0;
+      const matchesActivityOut = !showOnlyOut || item["Today's Out"] > 0;
+
+      return matchesCategory && matchesSearch && matchesActivityIn && matchesActivityOut;
     });
-  }, [inventory, selectedCategory, searchTerm]);
+  }, [inventory, selectedCategory, searchTerm, showOnlyIn, showOnlyOut]);
 
   // Get today's date formatted
   const todayDate = new Date().toLocaleDateString("en-GB", {
@@ -183,7 +191,6 @@ export default function RMInventory() {
               </div>
             </div>
 
-            {/* Category Filter */}
             <div className="w-full lg:w-72 space-y-2">
               <label className="text-[13px] font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider ml-1">
                 Material Category
@@ -208,6 +215,51 @@ export default function RMInventory() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Activity Filters */}
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <span className="text-[13px] font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider ml-1 mr-2">
+              Activity Today
+            </span>
+            
+            <button
+              onClick={() => setShowOnlyIn(!showOnlyIn)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full border-2 transition-all duration-300 font-medium text-[15px]
+                ${showOnlyIn 
+                  ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-[0_0_15px_rgba(16,185,129,0.15)] ring-4 ring-emerald-500/10' 
+                  : 'bg-white border-[var(--apple-gray-200)] text-[var(--apple-text-secondary)] hover:border-[var(--apple-gray-300)] hover:bg-[var(--apple-gray-50)]'
+                }`}
+            >
+              <ArrowDownCircle size={18} strokeWidth={showOnlyIn ? 2.5 : 2} />
+              <span>In Today</span>
+            </button>
+
+            <button
+              onClick={() => setShowOnlyOut(!showOnlyOut)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full border-2 transition-all duration-300 font-medium text-[15px]
+                ${showOnlyOut 
+                  ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-[0_0_15px_rgba(245,158,11,0.15)] ring-4 ring-amber-500/10' 
+                  : 'bg-white border-[var(--apple-gray-200)] text-[var(--apple-text-secondary)] hover:border-[var(--apple-gray-300)] hover:bg-[var(--apple-gray-50)]'
+                }`}
+            >
+              <ArrowUpCircle size={18} strokeWidth={showOnlyOut ? 2.5 : 2} />
+              <span>Out Today</span>
+            </button>
+
+            {(showOnlyIn || showOnlyOut || searchTerm || selectedCategory !== "All Categories") && (
+              <button
+                onClick={() => {
+                  setShowOnlyIn(false);
+                  setShowOnlyOut(false);
+                  setSearchTerm("");
+                  setSelectedCategory("All Categories");
+                }}
+                className="ml-auto text-sm text-[var(--apple-blue)] font-medium hover:underline px-2"
+              >
+                Reset all
+              </button>
+            )}
           </div>
         </div>
 
@@ -258,19 +310,14 @@ export default function RMInventory() {
                   No matching materials
                 </p>
                 <p className="text-[var(--apple-text-secondary)] text-[15px]">
-                  We couldn't find anything matching "
-                  <span className="text-[var(--apple-text)] font-medium">
-                    {searchTerm}
-                  </span>
-                  "
-                  {selectedCategory !== "All Categories" && (
-                    <span> in {selectedCategory}</span>
-                  )}
+                  We couldn't find anything matching your current filters.
                 </p>
                 <button
                   onClick={() => {
                     setSearchTerm("");
                     setSelectedCategory("All Categories");
+                    setShowOnlyIn(false);
+                    setShowOnlyOut(false);
                   }}
                   className="mt-6 text-[var(--apple-blue)] font-medium hover:underline flex items-center gap-2 mx-auto"
                 >
