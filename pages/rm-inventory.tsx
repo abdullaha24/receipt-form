@@ -218,48 +218,50 @@ export default function RMInventory() {
           </div>
 
           {/* Activity Filters */}
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span className="text-[13px] font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider ml-1 mr-2">
+          <div className="mt-6 space-y-3">
+            <span className="text-[13px] font-semibold text-[var(--apple-text-secondary)] uppercase tracking-wider ml-1 block">
               Activity Today
             </span>
             
-            <button
-              onClick={() => setShowOnlyIn(!showOnlyIn)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full border-2 transition-all duration-300 font-medium text-[15px]
-                ${showOnlyIn 
-                  ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-[0_0_15px_rgba(16,185,129,0.15)] ring-4 ring-emerald-500/10' 
-                  : 'bg-white border-[var(--apple-gray-200)] text-[var(--apple-text-secondary)] hover:border-[var(--apple-gray-300)] hover:bg-[var(--apple-gray-50)]'
-                }`}
-            >
-              <ArrowDownCircle size={18} strokeWidth={showOnlyIn ? 2.5 : 2} />
-              <span>In Today</span>
-            </button>
-
-            <button
-              onClick={() => setShowOnlyOut(!showOnlyOut)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full border-2 transition-all duration-300 font-medium text-[15px]
-                ${showOnlyOut 
-                  ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-[0_0_15px_rgba(245,158,11,0.15)] ring-4 ring-amber-500/10' 
-                  : 'bg-white border-[var(--apple-gray-200)] text-[var(--apple-text-secondary)] hover:border-[var(--apple-gray-300)] hover:bg-[var(--apple-gray-50)]'
-                }`}
-            >
-              <ArrowUpCircle size={18} strokeWidth={showOnlyOut ? 2.5 : 2} />
-              <span>Out Today</span>
-            </button>
-
-            {(showOnlyIn || showOnlyOut || searchTerm || selectedCategory !== "All Categories") && (
+            <div className="flex flex-wrap items-center gap-3">
               <button
-                onClick={() => {
-                  setShowOnlyIn(false);
-                  setShowOnlyOut(false);
-                  setSearchTerm("");
-                  setSelectedCategory("All Categories");
-                }}
-                className="ml-auto text-sm text-[var(--apple-blue)] font-medium hover:underline px-2"
+                onClick={() => setShowOnlyIn(!showOnlyIn)}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-full border-2 transition-all duration-300 font-medium text-[15px]
+                  ${showOnlyIn 
+                    ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-[0_0_15px_rgba(16,185,129,0.15)] ring-4 ring-emerald-500/10' 
+                    : 'bg-white border-[var(--apple-gray-200)] text-[var(--apple-text-secondary)] hover:border-[var(--apple-gray-300)] hover:bg-[var(--apple-gray-50)]'
+                  }`}
               >
-                Reset all
+                <ArrowDownCircle size={18} strokeWidth={showOnlyIn ? 2.5 : 2} />
+                <span>In Today</span>
               </button>
-            )}
+
+              <button
+                onClick={() => setShowOnlyOut(!showOnlyOut)}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-full border-2 transition-all duration-300 font-medium text-[15px]
+                  ${showOnlyOut 
+                    ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-[0_0_15px_rgba(245,158,11,0.15)] ring-4 ring-amber-500/10' 
+                    : 'bg-white border-[var(--apple-gray-200)] text-[var(--apple-text-secondary)] hover:border-[var(--apple-gray-300)] hover:bg-[var(--apple-gray-50)]'
+                  }`}
+              >
+                <ArrowUpCircle size={18} strokeWidth={showOnlyOut ? 2.5 : 2} />
+                <span>Out Today</span>
+              </button>
+
+              {(showOnlyIn || showOnlyOut || searchTerm || selectedCategory !== "All Categories") && (
+                <button
+                  onClick={() => {
+                    setShowOnlyIn(false);
+                    setShowOnlyOut(false);
+                    setSearchTerm("");
+                    setSelectedCategory("All Categories");
+                  }}
+                  className="ml-auto text-sm text-[var(--apple-blue)] font-medium hover:underline px-2"
+                >
+                  Reset all
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
