@@ -69,7 +69,7 @@ export default function RMInventory() {
   // Derive unique categories from data
   const categories = useMemo(() => {
     const uniqueGroups = new Set(
-      inventory.map((item) => item["MATERIAL GROUP"])
+      inventory.map((item) => item["MATERIAL GROUP"]).filter(Boolean)
     );
     return ["All Categories", ...Array.from(uniqueGroups).sort()];
   }, [inventory]);
@@ -80,23 +80,28 @@ export default function RMInventory() {
       const matchesCategory =
         selectedCategory === "All Categories" ||
         item["MATERIAL GROUP"] === selectedCategory;
-      const matchesSearch = item["Material Description"]
+      const matchesSearch = (item["Material Description"] || "")
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
       
-      const matchesActivityIn = !showOnlyIn || item["Today's In"] > 0;
-      const matchesActivityOut = !showOnlyOut || item["Today's Out"] > 0;
+      const matchesActivityIn = !showOnlyIn || (item["Today's In"] || 0) > 0;
+      const matchesActivityOut = !showOnlyOut || (item["Today's Out"] || 0) > 0;
 
       return matchesCategory && matchesSearch && matchesActivityIn && matchesActivityOut;
     });
   }, [inventory, selectedCategory, searchTerm, showOnlyIn, showOnlyOut]);
 
-  // Get today's date formatted
-  const todayDate = new Date().toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const [todayDate, setTodayDate] = useState("");
+
+  useEffect(() => {
+    setTodayDate(
+      new Date().toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    );
+  }, []);
 
   return (
     <div className="min-h-screen bg-[var(--apple-bg)] font-sans">
@@ -362,7 +367,7 @@ export default function RMInventory() {
                     >
                       <td className="py-4 px-6">
                         <span className="text-[15px] font-medium text-[var(--apple-text)]">
-                          {item["Material Description"]}
+                          {item["Material Description"] || "-"}
                         </span>
                       </td>
                       <td className="py-4 px-6 text-center">
@@ -370,28 +375,28 @@ export default function RMInventory() {
                           className="inline-flex items-center justify-center px-2.5 py-1 rounded-lg 
                           bg-[var(--apple-gray-100)] text-xs font-semibold text-[var(--apple-text-secondary)] uppercase"
                         >
-                          {item.UOM}
+                          {item.UOM || "-"}
                         </span>
                       </td>
                       <td className="py-4 px-6 text-right">
                         <span className="text-[15px] font-medium text-emerald-600 tabular-nums">
-                          +{item["Today's In"].toLocaleString()}
+                          +{(item["Today's In"] || 0).toLocaleString()}
                         </span>
                       </td>
                       <td className="py-4 px-6 text-right">
                         <span className="text-[15px] font-medium text-amber-600 tabular-nums">
-                          −{item["Today's Out"].toLocaleString()}
+                          −{(item["Today's Out"] || 0).toLocaleString()}
                         </span>
                       </td>
                       <td className="py-4 px-6 text-right">
                         <span
                           className={`text-[15px] font-semibold tabular-nums ${
-                            item["Closing Stock"] < 0
+                            (item["Closing Stock"] || 0) < 0
                               ? "text-red-600"
                               : "text-[var(--apple-text)]"
                           }`}
                         >
-                          {item["Closing Stock"].toLocaleString()}
+                          {(item["Closing Stock"] || 0).toLocaleString()}
                         </span>
                       </td>
                     </tr>
@@ -409,13 +414,13 @@ export default function RMInventory() {
                 >
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-[15px] font-semibold text-[var(--apple-text)] flex-1 pr-3">
-                      {item["Material Description"]}
+                      {item["Material Description"] || "-"}
                     </h3>
                     <span
                       className="inline-flex items-center justify-center px-2.5 py-1 rounded-lg 
                       bg-[var(--apple-gray-100)] text-xs font-semibold text-[var(--apple-text-secondary)] uppercase shrink-0"
                     >
-                      {item.UOM}
+                      {item.UOM || "-"}
                     </span>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
@@ -424,7 +429,7 @@ export default function RMInventory() {
                         In
                       </p>
                       <p className="text-base font-semibold text-emerald-600 tabular-nums">
-                        +{item["Today's In"].toLocaleString()}
+                        +{(item["Today's In"] || 0).toLocaleString()}
                       </p>
                     </div>
                     <div className="bg-amber-50 rounded-xl p-3 text-center">
@@ -432,19 +437,19 @@ export default function RMInventory() {
                         Out
                       </p>
                       <p className="text-base font-semibold text-amber-600 tabular-nums">
-                        −{item["Today's Out"].toLocaleString()}
+                        −{(item["Today's Out"] || 0).toLocaleString()}
                       </p>
                     </div>
                     <div
                       className={`rounded-xl p-3 text-center ${
-                        item["Closing Stock"] < 0
+                        (item["Closing Stock"] || 0) < 0
                           ? "bg-red-50"
                           : "bg-[var(--apple-gray-100)]"
                       }`}
                     >
                       <p
                         className={`text-[10px] font-semibold uppercase tracking-wide mb-1 ${
-                          item["Closing Stock"] < 0
+                          (item["Closing Stock"] || 0) < 0
                             ? "text-red-600"
                             : "text-[var(--apple-text-secondary)]"
                         }`}
@@ -453,12 +458,12 @@ export default function RMInventory() {
                       </p>
                       <p
                         className={`text-base font-bold tabular-nums ${
-                          item["Closing Stock"] < 0
+                          (item["Closing Stock"] || 0) < 0
                             ? "text-red-600"
                             : "text-[var(--apple-text)]"
                         }`}
                       >
-                        {item["Closing Stock"].toLocaleString()}
+                        {(item["Closing Stock"] || 0).toLocaleString()}
                       </p>
                     </div>
                   </div>
