@@ -9,13 +9,16 @@ import {
   Package,
   Truck,
   Box,
+  PackagePlus,
 } from "lucide-react";
 import { useState } from "react";
 import ApiSettingsModal from "../components/ApiSettingsModal";
+import ProductManagerModal from "../components/ProductManagerModal";
 import Logo from "../components/Logo";
 
 export default function Home() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isProductManagerOpen, setIsProductManagerOpen] = useState(false);
 
   // Entry Forms Section
   const entryFormCards = [
@@ -120,13 +123,22 @@ export default function Home() {
       {/* Header with logo and settings */}
       <header className="w-full px-4 sm:px-8 py-3 flex justify-between items-center">
         <Logo size="md" />
-        <button
-          onClick={() => setIsSettingsOpen(true)}
-          className="p-2.5 text-[var(--apple-text-secondary)] hover:text-[var(--apple-blue)] hover:bg-[var(--apple-blue)]/10 rounded-full transition-all duration-200 active:scale-95"
-          title="API Settings"
-        >
-          <Settings size={22} strokeWidth={1.75} />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setIsProductManagerOpen(true)}
+            className="p-2.5 text-[var(--apple-text-secondary)] hover:text-orange-500 hover:bg-orange-500/10 rounded-full transition-all duration-200 active:scale-95"
+            title="Manage Products"
+          >
+            <PackagePlus size={22} strokeWidth={1.75} />
+          </button>
+          <button
+            onClick={() => setIsSettingsOpen(true)}
+            className="p-2.5 text-[var(--apple-text-secondary)] hover:text-[var(--apple-blue)] hover:bg-[var(--apple-blue)]/10 rounded-full transition-all duration-200 active:scale-95"
+            title="API Settings"
+          >
+            <Settings size={22} strokeWidth={1.75} />
+          </button>
+        </div>
       </header>
 
       {/* Main content */}
@@ -178,6 +190,11 @@ export default function Home() {
       <ApiSettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      <ProductManagerModal
+        isOpen={isProductManagerOpen}
+        onClose={() => setIsProductManagerOpen(false)}
       />
     </div>
   );
